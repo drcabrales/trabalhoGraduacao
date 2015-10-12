@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Data Handling</string>
+    <string name="app_nameformat"><![CDATA[<font color=#FFFFFF>Data Handling]]></string>
+    <string name="title_section1">New table</string>
+    <string name="title_section2">New column</string>
+    <string name="title_section3">New data</string>
+    <string name="title_section1format"><![CDATA[<font color=#FFFFFF>New table]]></string>
+    <string name="title_section2format"><![CDATA[<font color=#FFFFFF>New column]]></string>
+    <string name="title_section3format"><![CDATA[<font color=#FFFFFF>New data]]></string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example"><![CDATA[<font color=#FFFFFF>New database]]></string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_new_database">NewDatabaseActivity</string>
+    <string name="newDB">Enter the new database name:</string>
+
+</resources>
