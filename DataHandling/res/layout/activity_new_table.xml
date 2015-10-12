@@ -1,0 +1,112 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#885DB2"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="br.com.ufpe.NewDatabaseActivity" >
+
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:textColor="#FFFFFF"
+	        android:textSize="20sp"
+	        android:layout_height="wrap_content"
+	        android:text="@string/app_name"
+	        android:gravity="center" />
+
+	    <ImageView
+	        android:id="@+id/imageView1"
+	        android:layout_width="30dp"
+	        android:layout_height="match_parent"
+	        android:src="@drawable/database" />
+	    
+    </LinearLayout>
+    
+    <TextView
+        android:id="@+id/txtDBName"
+        android:layout_width="fill_parent"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_height="wrap_content"
+        android:text="Database: teste"
+        android:paddingTop="50dp" />
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_height="wrap_content"
+        android:text="@string/newTable"
+        android:gravity="center"
+        android:paddingTop="30dp" />
+
+    <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        
+	    <EditText
+	        android:id="@+id/edtNewTableName"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="0.7"
+	        android:textColor="#FFFFFF"
+	        android:ems="10" >
+	    </EditText>
+	    
+	    <Button
+			android:id="@+id/btnNewTable"
+			android:text="Ok"
+			android:textColor="#FFFFFF"
+			android:textSize="12sp"
+			android:layout_width="60dp"
+			android:layout_height="40dp"
+			android:background="@drawable/buttonshape"/>
+	    
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:layout_height="wrap_content"
+        android:text="Select a table"
+        android:gravity="center"
+        android:paddingTop="30dp" />
+    
+     <LinearLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+	    
+	    <ListView
+	        android:id="@+id/listTables"
+	        android:layout_width="fill_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1" >
+	    </ListView>
+	    
+	
+		<Button
+			android:id="@+id/btnBack"
+			android:text="Back"
+			android:textColor="#FFFFFF"
+			android:textSize="12sp"
+			android:layout_width="fill_parent"
+			android:layout_height="40dp"
+			android:layout_gravity="bottom"
+			android:background="@drawable/buttonshape"/>
+		
+	</LinearLayout>
+
+</LinearLayout>
