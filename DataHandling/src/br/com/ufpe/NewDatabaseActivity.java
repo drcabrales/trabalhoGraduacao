@@ -3,13 +3,14 @@ package br.com.ufpe;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -45,16 +46,21 @@ public class NewDatabaseActivity extends Activity {
 				 * - ir para a tela de criação de tabelas desse banco
 				 */
 				if(!edtNewDatabaseName.getText().toString().equals("")){
-					namesDatabases.add(edtNewDatabaseName.getText().toString());
-					adapter.notifyDataSetChanged();
-				}
-				
-				boolean criou = criarBanco();
-				
-				if(criou){
-					//iniciar tela de criação de tabelas desse banco
-				}else{
-					Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
+					
+					boolean criou = criarBanco();
+					
+					if(criou){
+						namesDatabases.add(edtNewDatabaseName.getText().toString());
+						adapter.notifyDataSetChanged();
+						
+						//starta a nova activity
+						Intent intent = new Intent(getBaseContext(), NewTableActivity.class);
+						intent.putExtra("DBName", edtNewDatabaseName.getText().toString());
+						startActivity(intent);
+						
+					}else{
+						Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
+					}
 				}
 			}
 		});
@@ -67,6 +73,11 @@ public class NewDatabaseActivity extends Activity {
 				/* Nesse clique:
 				 * - iniciar tela de criação de tabelas do banco escolhido
 				 */
+				
+				//starta a nova activity
+				Intent intent = new Intent(getBaseContext(), NewTableActivity.class);
+				intent.putExtra("DBName", (String) parent.getAdapter().getItem(position));
+				startActivity(intent);
 			}
 		});
 	}
