@@ -2,8 +2,10 @@ package br.com.ufpe;
 
 import java.util.ArrayList;
 
+import br.com.ufpe.objects.Banco;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,6 +30,10 @@ public class NewDatabaseActivity extends Activity {
 	private ArrayAdapter<String> adapter;
 	
 	private ArrayList<String> namesDatabases;
+	
+	//banco de dados do sistema
+	private DBHelper database;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +53,10 @@ public class NewDatabaseActivity extends Activity {
 				 */
 				if(!edtNewDatabaseName.getText().toString().equals("")){
 					
-					boolean criou = criarBanco();
+					boolean criou = criarBanco(edtNewDatabaseName.getText().toString());
 					
+					//criou aqui significa: armazenou no db do sistema que pode existir um novo banco com esse nome
+					//a criação de fato ocorrerá quando ele adicionar uma tabela e uma coluna nela
 					if(criou){
 						namesDatabases.add(edtNewDatabaseName.getText().toString());
 						adapter.notifyDataSetChanged();
@@ -102,12 +110,19 @@ public class NewDatabaseActivity extends Activity {
 	}
 	
 	public void iniciarComponentes(){
+		
+		database = new DBHelper(getBaseContext());
+		
 		edtNewDatabaseName = (EditText) findViewById(R.id.edtNewDBName);
 		btnNewDatabase = (Button) findViewById(R.id.btnNewDB);
 		listDatabases = (ListView) findViewById(R.id.listDatabases);
 		
 		//preencher namesDatabases com os bancos vindos do sistema (que o usuário já inseriu previamente)
+		ArrayList<Banco> bancos = (ArrayList<Banco>) database.getAllNomesBancos();
 		namesDatabases = new ArrayList<String>();
+		for (int i = 0; i < bancos.size(); i++) {
+			namesDatabases.add(bancos.get(i).getNome());
+		}
 		
 		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesDatabases){
 			@Override
@@ -122,8 +137,13 @@ public class NewDatabaseActivity extends Activity {
 		
 	}
 	
-	public boolean criarBanco(){
-		//Método responsável por criar o banco com o nome que o usuário deu
-		return true;
+	public boolean criarBanco(String nomeDB){
+		long result = database.insertBanco(nomeDB);
+		
+		if(result == -1){
+			return false;
+		}else{
+			return true;
+		}
 	}
 }
