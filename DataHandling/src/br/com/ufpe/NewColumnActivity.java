@@ -20,17 +20,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class NewTableActivity extends Activity {
+public class NewColumnActivity extends Activity {
 	
-	private EditText edtNewTableName;
-	private Button btnNewTable;
-	private ListView listTables;
-	private TextView txtDBName;
-	private Button btnBack;
+	private Button btnNewColumn;
+	private Button btnSaveAndView;
+	private ListView listColumns;
+	private TextView txtTableName;
+	private Button btnBackToTables;
 	private ArrayAdapter<String> adapter;
 	
-	private ArrayList<String> namesTables;
-	private String nomeDB;
+	private ArrayList<String> namesColumns;
+	private String nomeTabela;
 
 	//banco de dados do sistema
 	private DBHelper database;
@@ -38,58 +38,50 @@ public class NewTableActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_new_table);
+		setContentView(R.layout.activity_new_column);
 		
 		Intent i = getIntent();
-		nomeDB = i.getExtras().getString("DBName");
+		nomeTabela = i.getExtras().getString("nameTable");
 		iniciarComponentes();
 		
 		//pega o nome do banco selecionado via extras do intent
 		
-		btnNewTable.setOnClickListener(new OnClickListener() {
+		btnNewColumn.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				/* Nesse clique:
-				 * - adicionar o nome do novo banco na lista de nomes de bancos
-				 * - criar a nova tabela caso não exista (se já existir, informar)
+				 * - abre o popup de criação de coluna
 				 */
-				if(!edtNewTableName.getText().toString().equals("")){
-					boolean criou = criarTabela(edtNewTableName.getText().toString(), nomeDB);
-					
-					if(criou){
-						namesTables.add(edtNewTableName.getText().toString());
-						adapter.notifyDataSetChanged();
-						
-						//não starta nova activity pq ele pode criar n tabelas,
-						//e depois acessar a que deseja para prosseguir
-					}else{
-						Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
-					}
-				}
 			}
 		});
 		
-		listTables.setOnItemClickListener(new OnItemClickListener() {
+		btnSaveAndView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				/* Nesse clique:
+				 * - vai para a tela de visualização de dados das colunas
+				 */
+			}
+		});
+		
+		listColumns.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				/* Nesse clique:
-				 * - iniciar tela de criação de colunas da tabela escolhida
+				 * - editar a coluna escolhida
 				 */
-				Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
-				i.putExtra("nameTable", (String) parent.getAdapter().getItem(position));
-				startActivity(i);
-				
 			}
 		});
 		
-		btnBack.setOnClickListener(new OnClickListener() {
+		btnBackToTables.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(getBaseContext(), NewDatabaseActivity.class);
+				Intent i = new Intent(getBaseContext(), NewTableActivity.class);
 				startActivity(i);
 			}
 		});
@@ -98,7 +90,7 @@ public class NewTableActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.new_table, menu);
+		getMenuInflater().inflate(R.menu.new_column, menu);
 		return true;
 	}
 
@@ -118,19 +110,18 @@ public class NewTableActivity extends Activity {
 		
 		database = new DBHelper(getBaseContext());
 		
-		edtNewTableName = (EditText) findViewById(R.id.edtNewTableName);
-		btnNewTable = (Button) findViewById(R.id.btnNewTable);
-		listTables = (ListView) findViewById(R.id.listTables);
-		btnBack = (Button) findViewById(R.id.btnBack);
+		btnNewColumn = (Button) findViewById(R.id.btnNewColumn);
+		listColumns = (ListView) findViewById(R.id.listColumns);
+		btnBackToTables = (Button) findViewById(R.id.btnBackToTables);
 		
-		//seta o nome do DB atual
-		txtDBName = (TextView) findViewById(R.id.txtDBName);
-		txtDBName.setText("Database: " + nomeDB);
+		//seta o nome da tabela atual
+		txtTableName = (TextView) findViewById(R.id.txtTableName);
+		txtTableName.setText("Table: " + nomeTabela);
 		
-		//preencher namesTables com as tabelas vindas do sistema (que o usuário já inseriu previamente)
-		namesTables = new ArrayList<String>();
+		//preencher namesColumns com as colunas vindas do sistema (que o usuário já inseriu previamente)
+		namesColumns = new ArrayList<String>();
 		
-		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesTables){
+		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesColumns){
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View view = super.getView(position, convertView, parent);
@@ -139,15 +130,15 @@ public class NewTableActivity extends Activity {
 		        return view;
 			}
 		};
-		listTables.setAdapter(adapter);
+		listColumns.setAdapter(adapter);
 		
 	}
 	
-	public boolean criarTabela(String tabela, String banco){
+	public boolean criarColuna(String coluna, String tabela){
 		//Método responsável por adicionar as tabelas que o usuário deseja criar 
 		//no banco do sistema
 		
-		long result = database.insertTabela(tabela, banco);
+		long result = database.insertColuna(coluna, tabela);
 		
 		if(result == -1){
 			return false;
