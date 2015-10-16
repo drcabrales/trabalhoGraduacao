@@ -2,6 +2,7 @@ package br.com.ufpe;
 
 import java.util.ArrayList;
 
+import br.com.ufpe.objects.Tabela;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -80,6 +81,7 @@ public class NewTableActivity extends Activity {
 				 */
 				Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
 				i.putExtra("nameTable", (String) parent.getAdapter().getItem(position));
+				i.putExtra("DBName", nomeDB);
 				startActivity(i);
 				
 			}
@@ -90,6 +92,7 @@ public class NewTableActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), NewDatabaseActivity.class);
+				i.putExtra("DBName", nomeDB);
 				startActivity(i);
 			}
 		});
@@ -129,6 +132,11 @@ public class NewTableActivity extends Activity {
 		
 		//preencher namesTables com as tabelas vindas do sistema (que o usuário já inseriu previamente)
 		namesTables = new ArrayList<String>();
+		ArrayList<Tabela> tabelas = new ArrayList<Tabela>();
+		tabelas = (ArrayList<Tabela>) database.getTabelasByBanco(nomeDB);
+		for (int i = 0; i < tabelas.size(); i++) {
+			namesTables.add(tabelas.get(i).getNome());
+		}
 		
 		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesTables){
 			@Override

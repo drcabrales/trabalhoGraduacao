@@ -51,6 +51,7 @@
 
      <EditText
          android:id="@+id/edtNomeColuna"
+         android:textColor="#FFFFFF"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:ems="10" >
@@ -94,12 +95,14 @@
      <Spinner
          android:id="@+id/spnTableFK"
          android:layout_width="fill_parent"
-         android:layout_height="wrap_content" />
+         android:layout_height="wrap_content"
+         android:visibility="gone" />
      
       <Spinner
          android:id="@+id/spnColumnFK"
          android:layout_width="fill_parent"
-         android:layout_height="wrap_content" />
+         android:layout_height="wrap_content"
+         android:visibility="gone" />
       
       <LinearLayout 
         android:layout_width="fill_parent"

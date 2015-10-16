@@ -2,6 +2,7 @@ package br.com.ufpe;
 
 import java.util.ArrayList;
 
+import br.com.ufpe.objects.Coluna;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -31,6 +32,8 @@ public class NewColumnActivity extends Activity {
 	
 	private ArrayList<String> namesColumns;
 	private String nomeTabela;
+	private String DBName;
+	private String nomeColunaAdicionada;
 
 	//banco de dados do sistema
 	private DBHelper database;
@@ -42,6 +45,7 @@ public class NewColumnActivity extends Activity {
 		
 		Intent i = getIntent();
 		nomeTabela = i.getExtras().getString("nameTable");
+		DBName = i.getExtras().getString("DBName");
 		iniciarComponentes();
 		
 		//pega o nome do banco selecionado via extras do intent
@@ -53,6 +57,9 @@ public class NewColumnActivity extends Activity {
 				/* Nesse clique:
 				 * - abre o popup de criação de coluna
 				 */
+				Intent i = new Intent(getBaseContext(), PopUpNewColumnActivity.class);
+				i.putExtra("nameTable", nomeTabela);
+				startActivity(i);
 			}
 		});
 		
@@ -82,6 +89,7 @@ public class NewColumnActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), NewTableActivity.class);
+				i.putExtra("DBName", DBName);
 				startActivity(i);
 			}
 		});
@@ -113,6 +121,7 @@ public class NewColumnActivity extends Activity {
 		btnNewColumn = (Button) findViewById(R.id.btnNewColumn);
 		listColumns = (ListView) findViewById(R.id.listColumns);
 		btnBackToTables = (Button) findViewById(R.id.btnBackToTables);
+		btnSaveAndView = (Button) findViewById(R.id.btnSaveAndView);
 		
 		//seta o nome da tabela atual
 		txtTableName = (TextView) findViewById(R.id.txtTableName);
@@ -120,6 +129,11 @@ public class NewColumnActivity extends Activity {
 		
 		//preencher namesColumns com as colunas vindas do sistema (que o usuário já inseriu previamente)
 		namesColumns = new ArrayList<String>();
+		ArrayList<Coluna> colunas = new ArrayList<Coluna>();
+		colunas = (ArrayList<Coluna>) database.getColunasByTabela(nomeTabela);
+		for (int i = 0; i < colunas.size(); i++) {
+			namesColumns.add(colunas.get(i).getNome());
+		}
 		
 		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesColumns){
 			@Override
@@ -132,18 +146,5 @@ public class NewColumnActivity extends Activity {
 		};
 		listColumns.setAdapter(adapter);
 		
-	}
-	
-	public boolean criarColuna(String coluna, String tabela){
-		//Método responsável por adicionar as tabelas que o usuário deseja criar 
-		//no banco do sistema
-		
-		long result = database.insertColuna(coluna, tabela);
-		
-		if(result == -1){
-			return false;
-		}else{
-			return true;
-		}
 	}
 }

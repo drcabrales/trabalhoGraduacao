@@ -24,5 +24,4 @@ public class Tabela {
 	public void setNomeBanco(String nomeBanco) {
 		this.nomeBanco = nomeBanco;
 	}
-
 }
