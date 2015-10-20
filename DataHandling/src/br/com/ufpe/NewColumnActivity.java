@@ -3,6 +3,7 @@ package br.com.ufpe;
 import java.util.ArrayList;
 
 import br.com.ufpe.objects.Coluna;
+import br.com.ufpe.objects.Tabela;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -68,8 +69,22 @@ public class NewColumnActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				/* Nesse clique:
+				 * - cria ou atualiza o banco e tabelas do usuário
 				 * - vai para a tela de visualização de dados das colunas
 				 */
+				
+				//TESTE DE FUNCIONAMENTO
+				ArrayList<Tabela> tabelas = new ArrayList<Tabela>();
+				tabelas.add(new Tabela("tabela1", "testandoDB"));
+				tabelas.add(new Tabela("tabela2", "testandoDB"));
+				
+				ArrayList<Coluna> colunas = new ArrayList<Coluna>();
+				colunas.add(new Coluna ("coluna1tb1", "integer", "tabela1", true, true, false, null, null)); //coluna chave primaria e auto incremental
+				colunas.add(new Coluna ("coluna2tb1", "text", "tabela1", false, false, false, null, null)); //coluna extra
+				
+				colunas.add(new Coluna ("coluna1tb2", "text", "tabela2", true, false, false, null, null)); //coluna chave primaria sem auto incremento
+				colunas.add(new Coluna ("coluna2tb2", "integer", "tabela2", false, false, true, "tabela1", "coluna1tb1")); //coluna FK que referencia a chave primária da primeira tabela
+				database.createUserDatabase(getBaseContext(), "testanaDB09988", tabelas, colunas);
 			}
 		});
 		

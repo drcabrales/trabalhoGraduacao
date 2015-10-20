@@ -205,4 +205,12 @@ public class DBHelper extends SQLiteOpenHelper{
 
         return retorno;
     }
+	
+	//método responsável por criar os bancos de dados do usuário
+	public DBHelperUsuario createUserDatabase(Context context, String nomeBanco, ArrayList<Tabela> tabelas, ArrayList<Coluna> colunas){
+		DBHelperUsuario helperUsu = new DBHelperUsuario(context, nomeBanco, tabelas, colunas);
+		//gambiarra pra teste
+		helperUsu.callOnCreate();
+		return helperUsu;
+	}
 }
