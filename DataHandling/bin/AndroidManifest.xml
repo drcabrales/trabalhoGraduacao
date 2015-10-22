@@ -38,6 +38,10 @@
             android:name=".PopUpNewColumnActivity"
             android:label="@string/title_activity_pop_up_new_column" >
         </activity>
+        <activity
+            android:name=".DataViewActivity"
+            android:label="@string/title_activity_data_view" >
+        </activity>
     </application>
 
 </manifest>

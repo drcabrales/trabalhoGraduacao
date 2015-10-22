@@ -35,6 +35,10 @@ public class NewColumnActivity extends Activity {
 	private String nomeTabela;
 	private String DBName;
 	private String nomeColunaAdicionada;
+	
+	//para o save and view
+	private ArrayList<Tabela> tabelas;
+	private ArrayList<Coluna> colunas;
 
 	//banco de dados do sistema
 	private DBHelper database;
@@ -73,18 +77,21 @@ public class NewColumnActivity extends Activity {
 				 * - vai para a tela de visualização de dados das colunas
 				 */
 				
-				//TESTE DE FUNCIONAMENTO
-				ArrayList<Tabela> tabelas = new ArrayList<Tabela>();
-				tabelas.add(new Tabela("tabela1", "testandoDB"));
-				tabelas.add(new Tabela("tabela2", "testandoDB"));
+				//preenchendo tabelas e colunas para finalmente criar o banco
+				tabelas = (ArrayList<Tabela>) database.getTabelasByBanco(DBName);
+				colunas = new ArrayList<Coluna>();
 				
-				ArrayList<Coluna> colunas = new ArrayList<Coluna>();
-				colunas.add(new Coluna ("coluna1tb1", "integer", "tabela1", true, true, false, null, null)); //coluna chave primaria e auto incremental
-				colunas.add(new Coluna ("coluna2tb1", "text", "tabela1", false, false, false, null, null)); //coluna extra
+				for (int i = 0; i < tabelas.size(); i++) {
+					colunas.addAll(database.getColunasByTabela(tabelas.get(i).getNome()));
+				}
 				
-				colunas.add(new Coluna ("coluna1tb2", "text", "tabela2", true, false, false, null, null)); //coluna chave primaria sem auto incremento
-				colunas.add(new Coluna ("coluna2tb2", "integer", "tabela2", false, false, true, "tabela1", "coluna1tb1")); //coluna FK que referencia a chave primária da primeira tabela
-				database.createUserDatabase(getBaseContext(), "testanaDB09988", tabelas, colunas);
+				//chamando método de criação do banco com tabelas e colunas
+				database.createUserDatabase(getBaseContext(), DBName, tabelas, colunas);
+				
+				//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
+				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+				i.putExtra("nameTable", nomeTabela);
+				startActivity(i);
 			}
 		});
 		
