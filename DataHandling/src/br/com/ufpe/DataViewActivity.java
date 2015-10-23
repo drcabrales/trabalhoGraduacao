@@ -14,7 +14,10 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ScrollView;
@@ -24,14 +27,18 @@ import android.widget.TextView;
 
 public class DataViewActivity extends Activity {
 	
+	private TextView tableName;
 	private TableLayout headerTable;
 	private TableLayout dataTable;
 	private ScrollView scrollVertical;
 	
 	private ArrayList<Coluna> colunas;
 	private String nameTabela;
+	private String DBName;
 	
 	private DBHelper database;
+	
+	private Button btnNovoDado;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +47,7 @@ public class DataViewActivity extends Activity {
 		
 		Intent i = getIntent();
 		nameTabela = i.getExtras().getString("nameTable");
+		DBName = i.getExtras().getString("DBName");
 		iniciarComponentes();
 		
 		//nesse ponto já sabemos o nome da tabela e as colunas. 
@@ -89,6 +97,21 @@ public class DataViewActivity extends Activity {
 		headerTable.addView(scrollVertical);
 		
 		
+		btnNovoDado.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//vai para a tela de inserção da nova linha
+				//passa: nome do banco, nome da tabela e colunas
+				Intent i = new Intent(getBaseContext(), NewDataActivity.class);
+				i.putExtra("DBName", DBName);
+				i.putExtra("TableName", nameTabela);
+				i.putExtra("ListaColunas", colunas);
+				startActivity(i);
+			}
+		});
+		
+		
 		
 	}
 
@@ -116,6 +139,11 @@ public class DataViewActivity extends Activity {
 		headerTable = (TableLayout) findViewById(R.id.headerTable);
 		scrollVertical = new ScrollView(this);
 		dataTable = new TableLayout(this);
+		
+		tableName = (TextView) findViewById(R.id.txtTableViewName);
+		tableName.setText("Table: " + nameTabela);
+		
+		btnNovoDado = (Button) findViewById(R.id.btnNewData);
 		
 		//preenchendo as colunas da visualização
 		colunas = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);

@@ -42,6 +42,10 @@
             android:name=".DataViewActivity"
             android:label="@string/title_activity_data_view" >
         </activity>
+        <activity
+            android:name=".NewDataActivity"
+            android:label="@string/title_activity_new_data" >
+        </activity>
     </application>
 
 </manifest>

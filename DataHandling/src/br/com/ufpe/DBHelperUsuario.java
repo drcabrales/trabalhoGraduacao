@@ -26,6 +26,10 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
         this.colunas = colunas;
 	}
 	
+	public DBHelperUsuario(Context context, String databaseName){
+		super(context, databaseName, null, DATABASE_VERSION);
+	}
+	
 	@Override 
 	public void onCreate(SQLiteDatabase db) { 
 		//criando as tabelas e colunas

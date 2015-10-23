@@ -234,7 +234,6 @@ public class PopUpNewColumnActivity extends Activity {
 		list.add("BLOB");
 		list.add("Boolean");
 		list.add("Datetime");
-		list.add("Decimal");
 		list.add("Double");
 		list.add("Float");
 		list.add("Integer");

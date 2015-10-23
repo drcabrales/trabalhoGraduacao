@@ -91,6 +91,7 @@ public class NewColumnActivity extends Activity {
 				//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
 				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
 				i.putExtra("nameTable", nomeTabela);
+				i.putExtra("DBName", DBName);
 				startActivity(i);
 			}
 		});
