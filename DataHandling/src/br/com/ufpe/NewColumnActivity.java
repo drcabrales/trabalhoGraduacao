@@ -32,6 +32,7 @@ public class NewColumnActivity extends Activity {
 	private ArrayAdapter<String> adapter;
 	
 	private ArrayList<String> namesColumns;
+	private ArrayList<String> namesTables;
 	private String nomeTabela;
 	private String DBName;
 	private String nomeColunaAdicionada;
@@ -50,6 +51,7 @@ public class NewColumnActivity extends Activity {
 		
 		Intent i = getIntent();
 		nomeTabela = i.getExtras().getString("nameTable");
+		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
 		DBName = i.getExtras().getString("DBName");
 		iniciarComponentes();
 		
@@ -64,6 +66,7 @@ public class NewColumnActivity extends Activity {
 				 */
 				Intent i = new Intent(getBaseContext(), PopUpNewColumnActivity.class);
 				i.putExtra("nameTable", nomeTabela);
+				i.putExtra("tablesList", namesTables);
 				startActivity(i);
 			}
 		});
@@ -91,6 +94,7 @@ public class NewColumnActivity extends Activity {
 				//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
 				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
 				i.putExtra("nameTable", nomeTabela);
+				i.putExtra("tablesList", namesTables);
 				i.putExtra("DBName", DBName);
 				startActivity(i);
 			}

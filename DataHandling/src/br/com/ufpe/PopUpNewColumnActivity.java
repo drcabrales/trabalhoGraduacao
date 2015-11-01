@@ -37,6 +37,10 @@ public class PopUpNewColumnActivity extends Activity {
 
 	private String nomeTabela;
 	private ArrayList<String> nomesTabelas;
+	
+	//names tables de repasse
+	private ArrayList<String> namesTables;
+	
 	private Coluna coluna;
 	private DBHelper database;
 
@@ -47,6 +51,7 @@ public class PopUpNewColumnActivity extends Activity {
 		
 		Intent i = getIntent();
 		nomeTabela = i.getExtras().getString("nameTable");
+		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
 		iniciarComponentes();
 
 		iniciarComponentes();
@@ -191,6 +196,7 @@ public class PopUpNewColumnActivity extends Activity {
 					if(criou){
 						Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
 						i.putExtra("nameTable", nomeTabela);
+						i.putExtra("tablesList", namesTables);
 						startActivity(i);
 					}else{
 						Toast.makeText(getBaseContext(), "It's not possible to create the column", Toast.LENGTH_SHORT);

@@ -81,6 +81,7 @@ public class NewTableActivity extends Activity {
 				 */
 				Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
 				i.putExtra("nameTable", (String) parent.getAdapter().getItem(position));
+				i.putExtra("tablesList", namesTables);
 				i.putExtra("DBName", nomeDB);
 				startActivity(i);
 				

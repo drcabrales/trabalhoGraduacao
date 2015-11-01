@@ -33,6 +33,8 @@ public class DataViewActivity extends Activity {
 	private ScrollView scrollVertical;
 	
 	private ArrayList<Coluna> colunas;
+	private ArrayList<String> namesTables;
+	private ArrayList<Tabela> tabelas;
 	private String nameTabela;
 	private String DBName;
 	
@@ -47,6 +49,7 @@ public class DataViewActivity extends Activity {
 		
 		Intent i = getIntent();
 		nameTabela = i.getExtras().getString("nameTable");
+		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
 		DBName = i.getExtras().getString("DBName");
 		iniciarComponentes();
 		
@@ -107,6 +110,8 @@ public class DataViewActivity extends Activity {
 				i.putExtra("DBName", DBName);
 				i.putExtra("TableName", nameTabela);
 				i.putExtra("ListaColunas", colunas);
+				i.putExtra("tablesList", namesTables);
+				i.putExtra("ListaTabelas", tabelas);
 				startActivity(i);
 			}
 		});
@@ -147,6 +152,11 @@ public class DataViewActivity extends Activity {
 		
 		//preenchendo as colunas da visualização
 		colunas = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
+		
+		tabelas = new ArrayList<Tabela>();
+		for (int i = 0; i < namesTables.size(); i++) {
+			tabelas.add(new Tabela(namesTables.get(i), DBName));
+		}
 		
 		
 	}
