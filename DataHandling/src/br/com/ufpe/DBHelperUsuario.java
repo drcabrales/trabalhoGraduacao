@@ -2,14 +2,18 @@ package br.com.ufpe;
 
 import java.sql.Blob;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 //classe responsável por criar os bancos do usuário
 public class DBHelperUsuario extends SQLiteOpenHelper{
@@ -104,7 +108,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			}else{
 				createTable = createTable.substring(0,createTable.length()-1) + "); ";
 			}
-			
+
 			if(!entrouAutoincrement){
 				createTable = createTable.substring(0,createTable.length()-4) + "); ";
 			}
@@ -154,7 +158,55 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 		}
 
-		return database.insert(nomeTabela, null, initialValues);
+		long retorno = database.insert(nomeTabela, null, initialValues);
+		return retorno;
+	}
+
+	public Map<String, Object> getAllDataFromTable(String tablename, ArrayList<Coluna> colunas){
+		Map<String, Object> retorno = new HashMap<String, Object>();
+		database = this.getWritableDatabase();
+
+		//pegando o nome das colunas
+		String[] nomesC = new String[colunas.size()];
+		for (int i = 0; i < colunas.size(); i++) {
+			nomesC[i] = colunas.get(i).getNome();
+		}
+
+		Cursor cursor = database.query(tablename, nomesC, null, null, null, null, null);
+
+		int contadorLinhas = 0;
+		while(cursor.moveToNext()){
+			for (int i = 0; i < nomesC.length; i++) {
+				//formato da key: nomedaColuna[linha][coluna]
+				String hashmapkey = nomesC[i] + contadorLinhas + i;
+				//MUDAR ISSO AQUI, DAR GET DO TIPO CERTO A PARTIR DO TIPO DA COLUNA (FUNCIONA ASSIM)
+				retorno.put(hashmapkey, cursor.getString(cursor.getColumnIndex(nomesC[i])));
+			}
+			contadorLinhas++;
+		}
+
+	
+		/*
+		//codigo para verificar as tabelas e colunas do banco
+		Cursor c = database.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+
+		if (c.moveToFirst()) {
+			int contador = 0;
+		    while ( !c.isAfterLast() ) {
+		        Log.d("NOMES TABELAASSSSSS ->>>" , c.getString(0));
+		        contador++;
+		        c.moveToNext();
+		    }
+		}
+		
+		Cursor dbCursor = database.query("tb", null, null, null, null, null, null);
+		String[] columnNames = dbCursor.getColumnNames();
+		
+		for (int i = 0; i < columnNames.length; i++) {
+			Log.d("NOMES COLUNASSS ->>>", columnNames[i]);
+		}
+		*/
+		return retorno;
 	}
 
 }

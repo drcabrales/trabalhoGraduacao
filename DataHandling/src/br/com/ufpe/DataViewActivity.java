@@ -1,6 +1,7 @@
 package br.com.ufpe;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
@@ -39,6 +40,7 @@ public class DataViewActivity extends Activity {
 	private String DBName;
 	
 	private DBHelper database;
+	private DBHelperUsuario dbHelperUsuario;
 	
 	private Button btnNovoDado;
 
@@ -79,14 +81,39 @@ public class DataViewActivity extends Activity {
 		
 		//for para adicionar os table row de dados no table layout datatable
 		//tem que pegar a lista de dados para usar nesse for. aqui vai entrar tb a logica do multimidia (botao diferenciado)
-		for (int j = 0; j < 25; j++) { //quantidade de linhas (dados)
+		Map<String, Object> dados = dbHelperUsuario.getAllDataFromTable(nameTabela, colunas);
+		
+		for (int j = 0; j < dados.size(); j++) { //quantidade de linhas (dados)
 			TableRow linha = new TableRow(this);
 			
 			for (int k = 0; k < colunas.size(); k++) { //quantidade colunas
 				TextView dadoColuna = new TextView(this);
 				dadoColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 				dadoColuna.setPadding(10, 10, 10, 10);
-				dadoColuna.setText("AAA");
+				
+				if(!colunas.get(k).getTipo().equals("BLOB")){
+					if(colunas.get(k).getTipo().equals("Varchar") || colunas.get(k).getTipo().equals("Text")){
+						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						dadoColuna.setText((String) dados.get(hashmapkey));
+					}else if(colunas.get(k).getTipo().equals("Integer")){
+						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						dadoColuna.setText((Integer) dados.get(hashmapkey) + "");
+					}else if(colunas.get(k).getTipo().equals("Double")){
+						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						dadoColuna.setText((Double) dados.get(hashmapkey) + "");
+					}else if(colunas.get(k).getTipo().equals("Float")){
+						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						dadoColuna.setText((Float) dados.get(hashmapkey) + "");
+					}else{
+						//boolean
+						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						dadoColuna.setText((Boolean) dados.get(hashmapkey) + "");
+					}
+					
+				}else{
+					//coloca a indicação do blob na tabela
+				}
+				
 				dadoColuna.setTextColor(Color.WHITE);
 				dadoColuna.setGravity(Gravity.CENTER);
 				linha.addView(dadoColuna);
@@ -141,6 +168,7 @@ public class DataViewActivity extends Activity {
 	
 	public void iniciarComponentes(){
 		database = new DBHelper(getBaseContext());
+		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
 		headerTable = (TableLayout) findViewById(R.id.headerTable);
 		scrollVertical = new ScrollView(this);
 		dataTable = new TableLayout(this);
