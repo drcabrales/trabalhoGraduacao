@@ -83,7 +83,7 @@ public class DataViewActivity extends Activity {
 		//tem que pegar a lista de dados para usar nesse for. aqui vai entrar tb a logica do multimidia (botao diferenciado)
 		Map<String, Object> dados = dbHelperUsuario.getAllDataFromTable(nameTabela, colunas);
 		
-		for (int j = 0; j < dados.size(); j++) { //quantidade de linhas (dados)
+		for (int j = 0; j < (dados.size()/colunas.size()); j++) { //quantidade de linhas (dados totais / colunas)
 			TableRow linha = new TableRow(this);
 			
 			for (int k = 0; k < colunas.size(); k++) { //quantidade colunas
@@ -168,7 +168,7 @@ public class DataViewActivity extends Activity {
 	
 	public void iniciarComponentes(){
 		database = new DBHelper(getBaseContext());
-		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
+		
 		headerTable = (TableLayout) findViewById(R.id.headerTable);
 		scrollVertical = new ScrollView(this);
 		dataTable = new TableLayout(this);
@@ -185,6 +185,8 @@ public class DataViewActivity extends Activity {
 		for (int i = 0; i < namesTables.size(); i++) {
 			tabelas.add(new Tabela(namesTables.get(i), DBName));
 		}
+		
+		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
 		
 		
 	}

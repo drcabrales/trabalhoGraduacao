@@ -42,6 +42,7 @@ public class PopUpNewColumnActivity extends Activity {
 	private ArrayList<String> namesTables;
 	
 	private Coluna coluna;
+	private String DBName;
 	private DBHelper database;
 
 	@Override
@@ -52,6 +53,7 @@ public class PopUpNewColumnActivity extends Activity {
 		Intent i = getIntent();
 		nomeTabela = i.getExtras().getString("nameTable");
 		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
+		DBName = i.getExtras().getString("DBName");
 		iniciarComponentes();
 
 		iniciarComponentes();
@@ -173,6 +175,9 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
+				i.putExtra("nameTable", nomeTabela);
+				i.putExtra("tablesList", namesTables);
+				i.putExtra("DBName", DBName);
 				startActivity(i);
 			}
 		});

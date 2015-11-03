@@ -144,9 +144,9 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
 				initialValues.put(colunas.get(i).getNome(), (String) dados.get(i));
 			}else if(colunas.get(i).getTipo().equals("Double")){
-				initialValues.put(colunas.get(i).getNome(), (Double) dados.get(i));
+				initialValues.put(colunas.get(i).getNome(), Double.parseDouble((String) dados.get(i)));
 			}else if(colunas.get(i).getTipo().equals("Float")){
-				initialValues.put(colunas.get(i).getNome(), (Float) dados.get(i));
+				initialValues.put(colunas.get(i).getNome(), Float.parseFloat((String)dados.get(i)));
 			}else if(colunas.get(i).getTipo().equals("Integer")){
 				initialValues.put(colunas.get(i).getNome(), Integer.parseInt((String) dados.get(i)));
 			}else if(colunas.get(i).getTipo().equals("Boolean")){
@@ -172,40 +172,34 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			nomesC[i] = colunas.get(i).getNome();
 		}
 
-		Cursor cursor = database.query(tablename, nomesC, null, null, null, null, null);
-
+		Cursor cursor = database.query(tablename, null, null, null, null, null, null);
+		cursor.getCount();
 		int contadorLinhas = 0;
-		while(cursor.moveToNext()){
-			for (int i = 0; i < nomesC.length; i++) {
-				//formato da key: nomedaColuna[linha][coluna]
-				String hashmapkey = nomesC[i] + contadorLinhas + i;
-				//MUDAR ISSO AQUI, DAR GET DO TIPO CERTO A PARTIR DO TIPO DA COLUNA (FUNCIONA ASSIM)
-				retorno.put(hashmapkey, cursor.getString(cursor.getColumnIndex(nomesC[i])));
-			}
-			contadorLinhas++;
+		if(cursor.moveToFirst()){
+			do{
+				for (int i = 0; i < nomesC.length; i++) {
+					//formato da key: nomedaColuna[linha][coluna]
+					//como nomesC tem os mesmo itens de colunas na mesma posição, posso fazer a verificação abaixo
+					String hashmapkey = nomesC[i] + contadorLinhas + i;
+					if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
+						retorno.put(hashmapkey, cursor.getString(cursor.getColumnIndex(nomesC[i])));
+					}else if(colunas.get(i).getTipo().equals("Integer")){
+						retorno.put(hashmapkey, cursor.getInt(cursor.getColumnIndex(nomesC[i])));
+					}else if(colunas.get(i).getTipo().equals("Double")){
+						retorno.put(hashmapkey, cursor.getDouble(cursor.getColumnIndex(nomesC[i])));
+					}else if(colunas.get(i).getTipo().equals("Float")){
+						retorno.put(hashmapkey, cursor.getFloat(cursor.getColumnIndex(nomesC[i])));
+					}else if(colunas.get(i).getTipo().equals("Boolean")){
+						retorno.put(hashmapkey, cursor.getInt(cursor.getColumnIndex(nomesC[i])) == 1? true : false);
+					}else{
+						//blob
+						retorno.put(hashmapkey, cursor.getBlob(cursor.getColumnIndex(nomesC[i])));
+					}
+					
+				}
+				contadorLinhas++;
+			}while(cursor.moveToNext());
 		}
-
-	
-		/*
-		//codigo para verificar as tabelas e colunas do banco
-		Cursor c = database.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-
-		if (c.moveToFirst()) {
-			int contador = 0;
-		    while ( !c.isAfterLast() ) {
-		        Log.d("NOMES TABELAASSSSSS ->>>" , c.getString(0));
-		        contador++;
-		        c.moveToNext();
-		    }
-		}
-		
-		Cursor dbCursor = database.query("tb", null, null, null, null, null, null);
-		String[] columnNames = dbCursor.getColumnNames();
-		
-		for (int i = 0; i < columnNames.length; i++) {
-			Log.d("NOMES COLUNASSS ->>>", columnNames[i]);
-		}
-		*/
 		return retorno;
 	}
 

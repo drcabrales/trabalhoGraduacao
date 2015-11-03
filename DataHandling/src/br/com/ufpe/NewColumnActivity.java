@@ -67,6 +67,7 @@ public class NewColumnActivity extends Activity {
 				Intent i = new Intent(getBaseContext(), PopUpNewColumnActivity.class);
 				i.putExtra("nameTable", nomeTabela);
 				i.putExtra("tablesList", namesTables);
+				i.putExtra("DBName", DBName);
 				startActivity(i);
 			}
 		});
