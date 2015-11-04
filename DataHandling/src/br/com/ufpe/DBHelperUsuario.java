@@ -1,7 +1,9 @@
 package br.com.ufpe;
 
 import java.sql.Blob;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -151,6 +153,9 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 				initialValues.put(colunas.get(i).getNome(), Integer.parseInt((String) dados.get(i)));
 			}else if(colunas.get(i).getTipo().equals("Boolean")){
 				initialValues.put(colunas.get(i).getNome(), (Boolean) dados.get(i));
+			}else if(colunas.get(i).getTipo().equals("Datetime")){
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				initialValues.put(colunas.get(i).getNome(), ((Date) dados.get(i)).getTime());
 			}else{
 				//BLOB
 				initialValues.put(colunas.get(i).getNome(), (byte[]) dados.get(i));
@@ -191,6 +196,8 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 						retorno.put(hashmapkey, cursor.getFloat(cursor.getColumnIndex(nomesC[i])));
 					}else if(colunas.get(i).getTipo().equals("Boolean")){
 						retorno.put(hashmapkey, cursor.getInt(cursor.getColumnIndex(nomesC[i])) == 1? true : false);
+					}else if(colunas.get(i).getTipo().equals("Datetime")){
+						retorno.put(hashmapkey, new Date(cursor.getLong(cursor.getColumnIndex(nomesC[i]))));
 					}else{
 						//blob
 						retorno.put(hashmapkey, cursor.getBlob(cursor.getColumnIndex(nomesC[i])));

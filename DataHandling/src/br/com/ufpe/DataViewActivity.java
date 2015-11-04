@@ -1,6 +1,8 @@
 package br.com.ufpe;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 
 import br.com.ufpe.objects.Coluna;
@@ -104,6 +106,10 @@ public class DataViewActivity extends Activity {
 					}else if(colunas.get(k).getTipo().equals("Float")){
 						String hashmapkey = colunas.get(k).getNome() + j+ k;
 						dadoColuna.setText((Float) dados.get(hashmapkey) + "");
+					}else if(colunas.get(k).getTipo().equals("Datetime")){
+						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+						dadoColuna.setText(format.format(dados.get(hashmapkey)) + "");
 					}else{
 						//boolean
 						String hashmapkey = colunas.get(k).getNome() + j+ k;

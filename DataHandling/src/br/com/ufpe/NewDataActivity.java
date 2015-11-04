@@ -5,7 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +39,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -76,6 +81,7 @@ public class NewDataActivity extends Activity {
 	private DBHelperUsuario dbUsuario;
 	private ArrayList<Object> allData;
 	private Coluna colunablob;
+	private DatePicker datepicker;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -379,6 +385,22 @@ public class NewDataActivity extends Activity {
 					}
 				});
 
+			}else{
+				//datetime
+				TextView nomeColuna = new TextView(this);
+				nomeColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+				nomeColuna.setPadding(0, 0, 0, 10);
+				nomeColuna.setText(colunas.get(j).getNome());
+				nomeColuna.setTextColor(Color.WHITE);
+				layout.addView(nomeColuna);
+
+				datepicker = new DatePicker(this);
+				final Calendar calendar = Calendar.getInstance();
+				int year = calendar.get(Calendar.YEAR);
+				int month = calendar.get(Calendar.MONTH);
+				int day = calendar.get(Calendar.DAY_OF_MONTH);
+				datepicker.init(year, month, day, null);
+				layout.addView(datepicker);
 			}
 		}
 
@@ -410,6 +432,20 @@ public class NewDataActivity extends Activity {
 						}
 
 						contadorSpinner++;
+					}else if(aux.getTipo().equals("Datetime")){
+						int day = datepicker.getDayOfMonth();
+						int month = datepicker.getMonth();
+						int year = datepicker.getYear();
+						
+						SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+						String finalDate = day + "/" + (month+1) + "/" + year;
+						
+						try {
+							allData.add(format.parse(finalDate));
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}else{
 						allData.add(allblobs.get(colunas.get(i).getNome()));
 					}
@@ -468,7 +504,7 @@ public class NewDataActivity extends Activity {
 						dataVideo);
 				intentVideoPlayer.setType("video/*");
 				intentVideoPlayer.setData(data.getData());
-				
+
 				InputStream iStream;
 				byte[] bytedados;
 				try {
