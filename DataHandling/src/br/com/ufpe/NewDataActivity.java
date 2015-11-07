@@ -53,9 +53,9 @@ import br.com.ufpe.objects.Tabela;
 
 public class NewDataActivity extends Activity {
 	private static int RESULT_LOAD_IMG = 1;
-	String imgDecodableString;
+	//String imgDecodableString;
 	Intent intentVideoPlayer;
-	String pathFromMusic;
+	//String pathFromMusic;
 	MediaPlayer mp;
 
 	private String DBName;
@@ -72,7 +72,7 @@ public class NewDataActivity extends Activity {
 	private ArrayList<Spinner> allSpns;
 
 	//guardar todos os blobs, identificados pela coluna
-	private Map<String, Object> allblobs = new HashMap<String, Object>();
+	//private Map<String, Object> allblobs = new HashMap<String, Object>();
 
 	private CheckBox chkImagem;
 	private CheckBox chkVideo;
@@ -82,6 +82,11 @@ public class NewDataActivity extends Activity {
 	private ArrayList<Object> allData;
 	private Coluna colunablob;
 	private DatePicker datepicker;
+	
+	private String uriImagem;
+	private String uriVideo;
+	private String uriMusica;
+	private Map<String, String> allUris;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -333,8 +338,8 @@ public class NewDataActivity extends Activity {
 						Intent intent = new Intent();
 						intent.setAction(Intent.ACTION_VIEW);
 
-						if(imgDecodableString != null){
-							Bitmap inImage = BitmapFactory.decodeFile(imgDecodableString);
+						if(uriImagem != null){
+							Bitmap inImage = BitmapFactory.decodeFile(uriImagem);
 							ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 							inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 							String path = Images.Media.insertImage(getBaseContext().getContentResolver(), inImage, "Title", null);
@@ -364,8 +369,8 @@ public class NewDataActivity extends Activity {
 
 					@Override
 					public void onClick(View v) {
-						if(pathFromMusic != null){
-							play(getBaseContext(), Uri.parse(pathFromMusic)); 
+						if(uriMusica != null){
+							play(getBaseContext(), Uri.parse(uriMusica)); 
 						}else{
 							Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
 						}
@@ -447,7 +452,8 @@ public class NewDataActivity extends Activity {
 							e.printStackTrace();
 						}
 					}else{
-						allData.add(allblobs.get(colunas.get(i).getNome()));
+						//allData.add(allblobs.get(colunas.get(i).getNome()));
+						allData.add(allUris.get(colunas.get(i).getNome()));
 					}
 
 					//verificando o tipo de coluna para saber onde buscar seu dado corretamente
@@ -484,14 +490,16 @@ public class NewDataActivity extends Activity {
 				cursor.moveToFirst();
 
 				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-				imgDecodableString = cursor.getString(columnIndex);
+				uriImagem = cursor.getString(columnIndex);
 
-
-				Bitmap inImage = BitmapFactory.decodeFile(imgDecodableString);
+				allUris.put(colunablob.getNome(),uriImagem);
+				
+				
+				/*Bitmap inImage = BitmapFactory.decodeFile(imgDecodableString);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 				byte[] bytesBlob = bytes.toByteArray();
-				allblobs.put(colunablob.getNome(),bytesBlob);
+				allblobs.put(colunablob.getNome(),bytesBlob);*/
 
 				cursor.close();
 
@@ -499,13 +507,16 @@ public class NewDataActivity extends Activity {
 					&& null != data && chkVideo.isChecked()){
 
 				Uri dataVideo = data.getData();
+				uriVideo = dataVideo.toString();
+				
+				allUris.put(colunablob.getNome(),uriVideo);
 
 				intentVideoPlayer = new Intent(Intent.ACTION_VIEW, 
 						dataVideo);
 				intentVideoPlayer.setType("video/*");
 				intentVideoPlayer.setData(data.getData());
 
-				InputStream iStream;
+				/*InputStream iStream;
 				byte[] bytedados;
 				try {
 					iStream = getContentResolver().openInputStream(intentVideoPlayer.getData());
@@ -517,15 +528,17 @@ public class NewDataActivity extends Activity {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+				}*/
 
 			}else if(resultCode == RESULT_OK && requestCode == 10
 					&& null != data && chkMusica.isChecked()){
 
 				Uri uriSound=data.getData();
-				pathFromMusic = getRealPathFromURI(getBaseContext(), uriSound);
+				uriMusica = getRealPathFromURI(getBaseContext(), uriSound);
+				
+				allUris.put(colunablob.getNome(),uriMusica);
 
-				InputStream iStream;
+				/*InputStream iStream;
 				byte[] bytedados;
 				try {
 					iStream = getContentResolver().openInputStream(Uri.parse(pathFromMusic));
@@ -537,7 +550,7 @@ public class NewDataActivity extends Activity {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+				}*/
 
 			}else {
 				Toast.makeText(this, "You haven't picked file",
@@ -585,6 +598,7 @@ public class NewDataActivity extends Activity {
 
 		allEds = new ArrayList<EditText>();
 		allSpns = new ArrayList<Spinner>();
+		allUris = new HashMap<String, String>();
 
 		allData = new ArrayList<Object>();
 	}

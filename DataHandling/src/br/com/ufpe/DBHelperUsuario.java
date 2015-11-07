@@ -1,5 +1,6 @@
 package br.com.ufpe;
 
+import java.io.IOException;
 import java.sql.Blob;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -54,7 +57,8 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			for (int j = 0; j < colunas.size(); j++) {
 				//se a coluna pertencer a tabela em questão
 				if(colunas.get(j).getNomeTabela().equals(tabelas.get(i).getNome())){
-					createTable = createTable + colunas.get(j).getNome() +" " + colunas.get(j).getTipo();
+					//tratamento do blob para virar apenas a url 
+					createTable = createTable + colunas.get(j).getNome() +" " + (colunas.get(j).getTipo().equals("BLOB") ? "Varchar":colunas.get(j).getTipo());
 
 					//se for chave primária, acrescenta o not null
 					//ATENÇÃO: SE FOR AUTOINCREMENTO, TIRA A NECESSIDADE DE TER CHAVE PRIMÁRIA COMPOSTA (ver essa lógica)
@@ -158,7 +162,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 				initialValues.put(colunas.get(i).getNome(), ((Date) dados.get(i)).getTime());
 			}else{
 				//BLOB
-				initialValues.put(colunas.get(i).getNome(), (byte[]) dados.get(i));
+				initialValues.put(colunas.get(i).getNome(), (String) dados.get(i));
 			}
 
 		}
@@ -200,7 +204,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 						retorno.put(hashmapkey, new Date(cursor.getLong(cursor.getColumnIndex(nomesC[i]))));
 					}else{
 						//blob
-						retorno.put(hashmapkey, cursor.getBlob(cursor.getColumnIndex(nomesC[i])));
+						retorno.put(hashmapkey, cursor.getString(cursor.getColumnIndex(nomesC[i])));
 					}
 					
 				}
@@ -209,5 +213,4 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 		}
 		return retorno;
 	}
-
 }
