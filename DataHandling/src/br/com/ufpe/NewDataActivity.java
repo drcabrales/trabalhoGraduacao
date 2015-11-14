@@ -71,13 +71,6 @@ public class NewDataActivity extends Activity {
 	//salva todos os spinners do layout
 	private ArrayList<Spinner> allSpns;
 
-	//guardar todos os blobs, identificados pela coluna
-	//private Map<String, Object> allblobs = new HashMap<String, Object>();
-
-	private CheckBox chkImagem;
-	private CheckBox chkVideo;
-	private CheckBox chkMusica;
-
 	private DBHelperUsuario dbUsuario;
 	private ArrayList<Object> allData;
 	private Coluna colunablob;
@@ -87,6 +80,12 @@ public class NewDataActivity extends Activity {
 	private String uriVideo;
 	private String uriMusica;
 	private Map<String, String> allUris;
+	
+	private Map<Integer, String> auxNomesColunas;
+	private int ordemBotaoSelecionarBlob;
+	private int ordemEscolhida;
+	
+	private String tipoBlobEscolhido;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -169,227 +168,148 @@ public class NewDataActivity extends Activity {
 				nomeColuna.setText(colunas.get(j).getNome());
 				nomeColuna.setTextColor(Color.WHITE);
 				layout.addView(nomeColuna);
-
-				//3 checkbox, cada um com um tipo de mídia para a pessoa escolher. Só marca um por vez
-				//aqui vai entrar um botão que abrira a tela da galeria de imagens, de vídeos ou de músicas
-				//quando ele escolher uma, a mídia deve ser salva de alguma forma
-
-				chkImagem = new CheckBox(this);
-				chkImagem.setText("Image");
-				chkImagem.setTextColor(Color.WHITE);
-				chkImagem.setPadding(0, 0, 10, 0);
-				chkImagem.setChecked(true);
-
-				chkVideo = new CheckBox(this);
-				chkVideo.setText("Movie");
-				chkVideo.setTextColor(Color.WHITE);
-				chkVideo.setPadding(0, 0, 10, 0);
-				chkVideo.setChecked(false);
-
-				chkMusica = new CheckBox(this);
-				chkMusica.setText("Music");
-				chkMusica.setTextColor(Color.WHITE);
-				chkMusica.setPadding(0, 0, 10, 0);
-				chkMusica.setChecked(false);
-
-				LinearLayout layoutCheckbox = new LinearLayout(this);
-				layoutCheckbox.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-				layoutCheckbox.setOrientation(LinearLayout.HORIZONTAL);
-				layoutCheckbox.addView(chkImagem);
-				layoutCheckbox.addView(chkVideo);
-				layoutCheckbox.addView(chkMusica);
-
-				layout.addView(layoutCheckbox);
-
-				final Button btnImagem = new Button(this);
-				btnImagem.setText("Select an image");
-				btnImagem.setVisibility(View.VISIBLE);
-
-				final Button btnVerImagem = new Button(this);
-				btnVerImagem.setText("see the image");
-				btnVerImagem.setVisibility(View.VISIBLE);
-
-				final Button btnVideo = new Button(this);
-				btnVideo.setText("Select a movie");
-				btnVideo.setVisibility(View.GONE);
-
-				final Button btnVerVideo = new Button(this);
-				btnVerVideo.setText("See the movie");
-				btnVerVideo.setVisibility(View.GONE);
-
-				final Button btnMusica = new Button(this);
-				btnMusica.setText("Select a music");
-				btnMusica.setVisibility(View.GONE);
-
-				final Button btnTocarMusica = new Button(this);
-				btnTocarMusica.setText("start music");
-				btnTocarMusica.setVisibility(View.GONE);
-
-				final Button btnPausarMusica = new Button(this);
-				btnPausarMusica.setText("pause music");
-				btnPausarMusica.setVisibility(View.GONE);
-
-				layout.addView(btnImagem);
-				layout.addView(btnVerImagem);
-				layout.addView(btnVideo);
-				layout.addView(btnVerVideo);
-				layout.addView(btnMusica);
-				layout.addView(btnTocarMusica);
-				layout.addView(btnPausarMusica);
-
-
-				//clique dos checkboxes para mudar a visibilidade das coisas relacionadas a ele
-				chkImagem.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-						chkImagem.setChecked(isChecked);
-						chkVideo.setChecked(false);
-						chkMusica.setChecked(false);
-
-						btnImagem.setVisibility(View.VISIBLE);
-						btnVerImagem.setVisibility(View.VISIBLE);
-						btnVideo.setVisibility(View.GONE);
-						btnVerVideo.setVisibility(View.GONE);
-						btnMusica.setVisibility(View.GONE);
-						btnTocarMusica.setVisibility(View.GONE);
-						btnPausarMusica.setVisibility(View.GONE);
-					}
-				});
-
-				chkVideo.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-						chkVideo.setChecked(isChecked);
-						chkImagem.setChecked(false);
-						chkMusica.setChecked(false);
-
-						btnImagem.setVisibility(View.GONE);
-						btnVerImagem.setVisibility(View.GONE);
-						btnVideo.setVisibility(View.VISIBLE);
-						btnVerVideo.setVisibility(View.VISIBLE);
-						btnMusica.setVisibility(View.GONE);
-						btnTocarMusica.setVisibility(View.GONE);
-						btnPausarMusica.setVisibility(View.GONE);
-					}
-				});
-
-				chkMusica.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-						chkMusica.setChecked(isChecked);
-						chkVideo.setChecked(false);
-						chkImagem.setChecked(false);
-
-						btnImagem.setVisibility(View.GONE);
-						btnVerImagem.setVisibility(View.GONE);
-						btnVideo.setVisibility(View.GONE);
-						btnVerVideo.setVisibility(View.GONE);
-						btnMusica.setVisibility(View.VISIBLE);
-						btnTocarMusica.setVisibility(View.VISIBLE);
-						btnPausarMusica.setVisibility(View.VISIBLE);
-					}
-				});
-
-
-				//clique dos botões de escolha de arquivo e armazenamento deles
+				
 				colunablob = colunas.get(j);
-				btnImagem.setOnClickListener(new OnClickListener() {
+				if(colunas.get(j).getTipoBlob().equals("Image")){
+					final Button btnImagem = new Button(this);
+					btnImagem.setText("Select an image");
+					btnImagem.setId(ordemBotaoSelecionarBlob);
+					auxNomesColunas.put(ordemBotaoSelecionarBlob, colunas.get(j).getNome());
+					
+					final Button btnVerImagem = new Button(this);
+					btnVerImagem.setText("see the image");
+					
+					layout.addView(btnImagem);
+					layout.addView(btnVerImagem);
+					
+					btnImagem.setOnClickListener(new OnClickListener() {
 
-					@Override
-					public void onClick(View v) {
-						// Create intent to Open Image applications like Gallery, Google Photos
-						Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-						// Start the Intent
-						startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
-					}
-				});
-
-				btnVideo.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						// Create intent to Open Image applications like Gallery, Google Photos
-						Intent videoIntent = new Intent(Intent.ACTION_PICK,
-								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-						videoIntent.setType("video/*");
-						// Start the Intent
-						startActivityForResult(videoIntent, 1);
-					}
-				});
-
-				btnMusica.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-						startActivityForResult(intent, 10);
-					}
-				});
-
-				//clique do botao de visualizacao de multimidia
-				btnVerImagem.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						Intent intent = new Intent();
-						intent.setAction(Intent.ACTION_VIEW);
-
-						if(uriImagem != null){
-							Bitmap inImage = BitmapFactory.decodeFile(uriImagem);
-							ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-							inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-							String path = Images.Media.insertImage(getBaseContext().getContentResolver(), inImage, "Title", null);
-
-							intent.setDataAndType(Uri.parse(path), "image/*");
-							startActivity(intent);
-						}else{
-							Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+						@Override
+						public void onClick(View v) {
+							// Create intent to Open Image applications like Gallery, Google Photos
+							tipoBlobEscolhido = "Image";
+							ordemEscolhida = btnImagem.getId();
+							Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+							// Start the Intent
+							startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
 						}
+					});
+					
+					btnVerImagem.setOnClickListener(new OnClickListener() {
 
-					}
-				});
+						@Override
+						public void onClick(View v) {
+							Intent intent = new Intent();
+							intent.setAction(Intent.ACTION_VIEW);
 
-				btnVerVideo.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						if(intentVideoPlayer != null){
-							startActivity(intentVideoPlayer);
-						}else{
-							Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+							if(uriImagem != null){
+								Bitmap inImage = BitmapFactory.decodeFile(uriImagem);
+								ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+								inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+								String path = Images.Media.insertImage(getBaseContext().getContentResolver(), inImage, "Title", null);
+
+								intent.setDataAndType(Uri.parse(path), "image/*");
+								startActivity(intent);
+							}else{
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+							}
+
 						}
+					});
+				}else if(colunas.get(j).getTipoBlob().equals("Movie")){
+					final Button btnVideo = new Button(this);
+					btnVideo.setText("Select a movie");
+					btnVideo.setId(ordemBotaoSelecionarBlob);
+					auxNomesColunas.put(ordemBotaoSelecionarBlob, colunas.get(j).getNome());
 
-					}
-				});
+					final Button btnVerVideo = new Button(this);
+					btnVerVideo.setText("See the movie");
+					
+					layout.addView(btnVideo);
+					layout.addView(btnVerVideo);
+					
+					btnVideo.setOnClickListener(new OnClickListener() {
 
-				btnTocarMusica.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						if(uriMusica != null){
-							play(getBaseContext(), Uri.parse(uriMusica)); 
-						}else{
-							Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+						@Override
+						public void onClick(View v) {
+							// Create intent to Open Image applications like Gallery, Google Photos
+							tipoBlobEscolhido = "Movie";
+							ordemEscolhida = btnVideo.getId();
+							Intent videoIntent = new Intent(Intent.ACTION_PICK,
+									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+							videoIntent.setType("video/*");
+							// Start the Intent
+							startActivityForResult(videoIntent, 1);
 						}
+					});
+					
+					btnVerVideo.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							if(intentVideoPlayer != null){
+								startActivity(intentVideoPlayer);
+							}else{
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+							}
 
-					}
-				});
-
-				btnPausarMusica.setOnClickListener(new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						if(mp!= null){
-							pause();
-						}else{
-							Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
 						}
-					}
-				});
+					});
+				}else{
+					final Button btnMusica = new Button(this);
+					btnMusica.setText("Select a music");
+					btnMusica.setId(ordemBotaoSelecionarBlob);
+					auxNomesColunas.put(ordemBotaoSelecionarBlob, colunas.get(j).getNome());
+					
+					final Button btnTocarMusica = new Button(this);
+					btnTocarMusica.setText("start music");
 
+					final Button btnPausarMusica = new Button(this);
+					btnPausarMusica.setText("pause music");
+					
+					layout.addView(btnMusica);
+					layout.addView(btnTocarMusica);
+					layout.addView(btnPausarMusica);
+					
+					btnMusica.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							tipoBlobEscolhido = "Music";
+							ordemEscolhida = btnMusica.getId();
+							Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+							startActivityForResult(intent, 10);
+						}
+					});
+
+					btnTocarMusica.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if(uriMusica != null){
+								play(getBaseContext(), Uri.parse(uriMusica)); 
+							}else{
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+							}
+
+						}
+					});
+
+					btnPausarMusica.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if(mp!= null){
+								pause();
+							}else{
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
+							}
+						}
+					});
+
+				}
+
+				ordemBotaoSelecionarBlob++;
 			}else{
 				//datetime
 				TextView nomeColuna = new TextView(this);
@@ -417,7 +337,6 @@ public class NewDataActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// FAZER A LÓGICA DE INSERÇÃO DE DADOS NO BANCO DE FATO
 				//coletar todos os dados pro array de objetos na ordem correta das colunas
 				int contadorEditText = 0;
 				int contadorSpinner = 0;
@@ -477,7 +396,7 @@ public class NewDataActivity extends Activity {
 		try {
 			// When an Image is picked
 			if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-					&& null != data && chkImagem.isChecked()) {
+					&& null != data && tipoBlobEscolhido.equals("Image")) {
 				// Get the Image from data
 
 				Uri selectedImage = data.getData();
@@ -492,65 +411,30 @@ public class NewDataActivity extends Activity {
 				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 				uriImagem = cursor.getString(columnIndex);
 
-				allUris.put(colunablob.getNome(),uriImagem);
-				
-				
-				/*Bitmap inImage = BitmapFactory.decodeFile(imgDecodableString);
-				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-				inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-				byte[] bytesBlob = bytes.toByteArray();
-				allblobs.put(colunablob.getNome(),bytesBlob);*/
+				allUris.put(auxNomesColunas.get(ordemEscolhida),uriImagem);
 
 				cursor.close();
 
 			} else if(requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-					&& null != data && chkVideo.isChecked()){
+					&& null != data && tipoBlobEscolhido.equals("Movie")){
 
 				Uri dataVideo = data.getData();
 				uriVideo = dataVideo.toString();
 				
-				allUris.put(colunablob.getNome(),uriVideo);
+				allUris.put(auxNomesColunas.get(ordemEscolhida),uriVideo);
 
 				intentVideoPlayer = new Intent(Intent.ACTION_VIEW, 
 						dataVideo);
 				intentVideoPlayer.setType("video/*");
 				intentVideoPlayer.setData(data.getData());
 
-				/*InputStream iStream;
-				byte[] bytedados;
-				try {
-					iStream = getContentResolver().openInputStream(intentVideoPlayer.getData());
-					bytedados = getBytes(iStream);
-					allblobs.put(colunablob.getNome(),bytedados);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
-
 			}else if(resultCode == RESULT_OK && requestCode == 10
-					&& null != data && chkMusica.isChecked()){
+					&& null != data && tipoBlobEscolhido.equals("Music")){
 
 				Uri uriSound=data.getData();
 				uriMusica = getRealPathFromURI(getBaseContext(), uriSound);
 				
-				allUris.put(colunablob.getNome(),uriMusica);
-
-				/*InputStream iStream;
-				byte[] bytedados;
-				try {
-					iStream = getContentResolver().openInputStream(Uri.parse(pathFromMusic));
-					bytedados = getBytes(iStream);
-					allblobs.put(colunablob.getNome(), bytedados);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
+				allUris.put(auxNomesColunas.get(ordemEscolhida),uriMusica);
 
 			}else {
 				Toast.makeText(this, "You haven't picked file",
@@ -601,6 +485,10 @@ public class NewDataActivity extends Activity {
 		allUris = new HashMap<String, String>();
 
 		allData = new ArrayList<Object>();
+		
+		auxNomesColunas = new HashMap<Integer, String>();
+		ordemBotaoSelecionarBlob = 0;
+		ordemEscolhida = 0;
 	}
 
 	private void play(Context context, Uri uri) {

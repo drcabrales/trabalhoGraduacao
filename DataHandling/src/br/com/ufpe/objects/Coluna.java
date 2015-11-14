@@ -16,8 +16,11 @@ public class Coluna implements Serializable{
 	private String nomeTabelaFK;
 	private String nomeColunaFK;
 	
+	//alteração para o blob
+	//caso não seja blob, inserir nulo
+	private String tipoBlob;
 	
-	public Coluna(String nome, String tipo, String nomeTabela, boolean PK, boolean autoincrement, boolean FK, String nomeTabelaFK, String nomeColunaFK){
+	public Coluna(String nome, String tipo, String nomeTabela, boolean PK, boolean autoincrement, boolean FK, String nomeTabelaFK, String nomeColunaFK, String tipoBlob){
 		this.nome = nome;
 		this.tipo = tipo;
 		this.nomeTabela = nomeTabela;
@@ -26,6 +29,7 @@ public class Coluna implements Serializable{
 		this.FK = FK;
 		this.nomeTabelaFK = nomeTabelaFK;
 		this.nomeColunaFK = nomeColunaFK;
+		this.tipoBlob = tipoBlob;
 	}
 	
 	public Coluna(){}
@@ -92,5 +96,13 @@ public class Coluna implements Serializable{
 
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
+	}
+
+	public String getTipoBlob() {
+		return tipoBlob;
+	}
+
+	public void setTipoBlob(String tipoBlob) {
+		this.tipoBlob = tipoBlob;
 	}
 }

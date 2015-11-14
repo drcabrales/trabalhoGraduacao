@@ -29,6 +29,7 @@ public class PopUpNewColumnActivity extends Activity {
 	private Spinner spnType;
 	private Spinner spnTableFK;
 	private Spinner spnColumnFK;
+	private Spinner spnTipoBlob;
 	private CheckBox chkPK;
 	private CheckBox chkAutoincrement;
 	private CheckBox chkFK;
@@ -65,9 +66,36 @@ public class PopUpNewColumnActivity extends Activity {
 					int position, long id) {
 				if(position != 0){
 					coluna.setTipo((String) parent.getAdapter().getItem(position));
+					
+					if(coluna.getTipo().equals("BLOB")){
+						spnTipoBlob.setVisibility(View.VISIBLE);
+					}else{
+						spnTipoBlob.setVisibility(View.GONE);
+						coluna.setTipoBlob(null);
+					}
 				}else{
 					coluna.setTipo(null);
 				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		spnTipoBlob.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				if(position != 0){
+					coluna.setTipoBlob((String) parent.getAdapter().getItem(position));
+				}else{
+					coluna.setTipoBlob(null);
+				}
+				
 			}
 
 			@Override
@@ -257,6 +285,19 @@ public class PopUpNewColumnActivity extends Activity {
 
 		spnTableFK = (Spinner) findViewById(R.id.spnTableFK);
 		spnColumnFK = (Spinner) findViewById(R.id.spnColumnFK);
+		//alteração para tipo do blob
+		spnTipoBlob = (Spinner) findViewById(R.id.spnTypeBlob);
+		List<String> listTBlob = new ArrayList<String>();
+		listTBlob.add("Select a BLOB type");
+		listTBlob.add("Image");
+		listTBlob.add("Movie");
+		listTBlob.add("Music");
+		ArrayAdapter<String> dataAdapterTBlob = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item, listTBlob);
+		dataAdapterTBlob.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spnTipoBlob.setAdapter(dataAdapterTBlob);
+		
+		
 		chkPK = (CheckBox) findViewById(R.id.chkPK);
 		chkFK = (CheckBox) findViewById(R.id.chkFK);
 		chkAutoincrement = (CheckBox) findViewById(R.id.chkAutoI);
@@ -285,7 +326,7 @@ public class PopUpNewColumnActivity extends Activity {
 			fk = 1;
 		}
 		
-		long retorno = database.insertColuna(coluna.getNome(), coluna.getTipo(), nomeTabela, pk, autoincrement, fk, coluna.getNomeTabelaFK(), coluna.getNomeColunaFK());
+		long retorno = database.insertColuna(coluna.getNome(), coluna.getTipo(), nomeTabela, pk, autoincrement, fk, coluna.getNomeTabelaFK(), coluna.getNomeColunaFK(), coluna.getTipoBlob());
 		
 		if(retorno == -1){
 			return false;

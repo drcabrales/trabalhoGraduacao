@@ -68,6 +68,12 @@
          android:id="@+id/spnType"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"/>
+     
+     <Spinner
+         android:id="@+id/spnTypeBlob"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:visibility="gone"/>
 
      <CheckBox
          android:id="@+id/chkPK"

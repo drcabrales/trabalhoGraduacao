@@ -29,7 +29,7 @@ public class DBHelper extends SQLiteOpenHelper{
              "create table "+ TABLE2_NAME +" (nome text not null, nomeBanco text not null, PRIMARY KEY (nome), FOREIGN KEY(nomeBanco) REFERENCES "+TABLE1_NAME+" (nome));";
      
      private static final String DATABASE_CREATE_COLUNA =
-             "create table "+ TABLE3_NAME +" (nome text not null, tipo text not null, nomeTabela text not null, isPK integer, isAutoincrement integer, isFK integer, nomeTabelaFK text, nomeColunaFK text, PRIMARY KEY (nome), FOREIGN KEY(nomeTabela) REFERENCES "+TABLE2_NAME+" (nome));";
+             "create table "+ TABLE3_NAME +" (nome text not null, tipo text not null, nomeTabela text not null, isPK integer, isAutoincrement integer, isFK integer, nomeTabelaFK text, nomeColunaFK text, tipoBlob text, PRIMARY KEY (nome), FOREIGN KEY(nomeTabela) REFERENCES "+TABLE2_NAME+" (nome));";
      
      
 	public DBHelper(Context context) {
@@ -69,7 +69,7 @@ public class DBHelper extends SQLiteOpenHelper{
         return database.insert(TABLE2_NAME, null, initialValues);
 	}
 	
-	public long insertColuna(String nomeColuna, String tipo, String nomeTabela, int isPK, int isAutoincrement, int isFK, String nomeTabelaFK, String nomeColunaFK){
+	public long insertColuna(String nomeColuna, String tipo, String nomeTabela, int isPK, int isAutoincrement, int isFK, String nomeTabelaFK, String nomeColunaFK, String tipoBlob){
 		database = this.getWritableDatabase();
 		ContentValues initialValues = new ContentValues();
         initialValues.put("nome", nomeColuna);
@@ -78,6 +78,7 @@ public class DBHelper extends SQLiteOpenHelper{
         initialValues.put("isPK", isPK);
         initialValues.put("isAutoincrement", isAutoincrement);
         initialValues.put("isFK", isFK);
+        initialValues.put("tipoBlob", tipoBlob);
         
         if(nomeTabelaFK != null){
         	initialValues.put("nomeTabelaFK", nomeTabelaFK);
@@ -120,7 +121,7 @@ public class DBHelper extends SQLiteOpenHelper{
 	
 	public List<Coluna> getAllNomesColunas() {
         database = this.getReadableDatabase();
-        Cursor cursor = database.query(TABLE3_NAME, new String[] { "nome", "nomeTabela", "isPK", "isAutoincrement", "isFK", "nomeTabelaFK", "nomeColunaFK" }, null, null, null, null, null);
+        Cursor cursor = database.query(TABLE3_NAME, new String[] { "nome", "nomeTabela", "isPK", "isAutoincrement", "isFK", "nomeTabelaFK", "nomeColunaFK", "tipoBlob" }, null, null, null, null, null);
 
         List<Coluna> retorno = new ArrayList<Coluna>();
 
@@ -128,6 +129,7 @@ public class DBHelper extends SQLiteOpenHelper{
         	int pk = cursor.getInt(cursor.getColumnIndex("isPK"));
         	int autoincrement = cursor.getInt(cursor.getColumnIndex("isAutoincrement"));
         	int fk = cursor.getInt(cursor.getColumnIndex("isFK"));
+        	String tipoBlob = cursor.getString(cursor.getColumnIndex("tipoBlob"));
         	
         	boolean Bpk, BAutoincrement, Bfk;
         	if(pk == 1){
@@ -149,7 +151,7 @@ public class DBHelper extends SQLiteOpenHelper{
         	}
         	
         	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
-        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")));
+        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
             retorno.add(coluna);
         }
 
@@ -178,6 +180,7 @@ public class DBHelper extends SQLiteOpenHelper{
         	int pk = cursor.getInt(cursor.getColumnIndex("isPK"));
         	int autoincrement = cursor.getInt(cursor.getColumnIndex("isAutoincrement"));
         	int fk = cursor.getInt(cursor.getColumnIndex("isFK"));
+        	String tipoBlob = cursor.getString(cursor.getColumnIndex("tipoBlob"));
         	
         	boolean Bpk, BAutoincrement, Bfk;
         	if(pk == 1){
@@ -199,7 +202,7 @@ public class DBHelper extends SQLiteOpenHelper{
         	}
         	
         	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
-        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")));
+        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
         	retorno.add(coluna);
         }
 

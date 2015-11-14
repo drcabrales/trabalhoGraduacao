@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import br.com.ufpe.objects.Coluna;
@@ -53,6 +54,8 @@ public class DataViewActivity extends Activity {
 	private DBHelperUsuario dbHelperUsuario;
 
 	private Button btnNovoDado;
+	
+	private Map<Integer, String> auxDadosBlob;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +101,6 @@ public class DataViewActivity extends Activity {
 
 			for (int k = 0; k < colunas.size(); k++) { //quantidade colunas
 				TextView dadoColuna = new TextView(this);
-				Button btnVerBlob = new Button(this);
 				dadoColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 				dadoColuna.setPadding(10, 10, 10, 10);
 
@@ -129,11 +131,16 @@ public class DataViewActivity extends Activity {
 					//coloca a indicação do blob na tabela
 					//por enquanto fica o path, pra ver se deu certo
 					String hashmapkey = colunas.get(k).getNome() + j+ k;
+					
 					final String path = (String) dados.get(hashmapkey) + "";
-
+					
+					//salvando o path para a coluna correta
+					auxDadosBlob.put(Integer.parseInt(j+""+k), path);
+					
 					if(path.substring(path.length()-3, path.length()).equals("png") || path.substring(path.length()-3, path.length()).equals("jpg") || path.substring(path.length()-4, path.length()).equals("jpeg")){ //imagem
-
+						final Button btnVerBlob = new Button(this);
 						btnVerBlob.setText("IMG");
+						btnVerBlob.setId(Integer.parseInt(j + "" + k));
 
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -144,7 +151,7 @@ public class DataViewActivity extends Activity {
 
 								Intent intent = new Intent();
 								intent.setAction(Intent.ACTION_VIEW);
-								Bitmap inImage = BitmapFactory.decodeFile(path);
+								Bitmap inImage = BitmapFactory.decodeFile(auxDadosBlob.get(btnVerBlob.getId()));
 								ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 								inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 								String path = Images.Media.insertImage(getBaseContext().getContentResolver(), inImage, "Title", null);
@@ -154,9 +161,13 @@ public class DataViewActivity extends Activity {
 
 							}
 						});
+						
+						linha.addView(btnVerBlob);
 
 					}else if(path.substring(path.length()-3, path.length()).equals("mp3") || path.substring(path.length()-3, path.length()).equals("ogg") || path.substring(path.length()-3, path.length()).equals("aac")){ //musica
+						final Button btnVerBlob = new Button(this);
 						btnVerBlob.setText("MUS");
+						btnVerBlob.setId(Integer.parseInt(j + "" + k));
 						
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -164,14 +175,17 @@ public class DataViewActivity extends Activity {
 							public void onClick(View v) {
 								//teste com audio
 
-								play(getBaseContext(), Uri.parse(path)); 
+								play(getBaseContext(), Uri.parse(auxDadosBlob.get(btnVerBlob.getId()))); 
 
 							}
 						});
 						
+						linha.addView(btnVerBlob);
 
 					}else{ //video
+						final Button btnVerBlob = new Button(this);
 						btnVerBlob.setText("VID");
+						btnVerBlob.setId(Integer.parseInt(j + "" + k));
 
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -180,22 +194,22 @@ public class DataViewActivity extends Activity {
 								//teste com video
 
 
-								Intent intentVideoPlayer = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
+								Intent intentVideoPlayer = new Intent(Intent.ACTION_VIEW, Uri.parse(auxDadosBlob.get(btnVerBlob.getId())));
 								intentVideoPlayer.setType("video/*");
 								intentVideoPlayer.setData(Uri.parse(path));
 								startActivity(intentVideoPlayer);
 
 							}
 						});
+						
+						linha.addView(btnVerBlob);
 					}
 
 				}
 
 				dadoColuna.setTextColor(Color.WHITE);
 				dadoColuna.setGravity(Gravity.CENTER);
-				if(colunas.get(k).getTipo().equals("BLOB")){
-					linha.addView(btnVerBlob);
-				}else{
+				if(!colunas.get(k).getTipo().equals("BLOB")){
 					linha.addView(dadoColuna);
 				}
 
@@ -269,6 +283,8 @@ public class DataViewActivity extends Activity {
 		}
 
 		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
+		
+		auxDadosBlob = new HashMap<Integer, String>();
 
 
 	}
