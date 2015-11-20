@@ -3,6 +3,7 @@ package br.com.ufpe;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.ufpe.objects.Alteracao;
 import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
 import android.app.Activity;
@@ -39,8 +40,9 @@ public class PopUpNewColumnActivity extends Activity {
 	private String nomeTabela;
 	private ArrayList<String> nomesTabelas;
 	
-	//names tables de repasse
+	//names tables de repasse e alteracoes
 	private ArrayList<String> namesTables;
+	private ArrayList<Alteracao> listaAlteracao;
 	
 	private Coluna coluna;
 	private String DBName;
@@ -54,6 +56,7 @@ public class PopUpNewColumnActivity extends Activity {
 		Intent i = getIntent();
 		nomeTabela = i.getExtras().getString("nameTable");
 		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
+		listaAlteracao = (ArrayList<Alteracao>) i.getExtras().get("listaAlteracao");
 		DBName = i.getExtras().getString("DBName");
 		iniciarComponentes();
 
@@ -206,6 +209,7 @@ public class PopUpNewColumnActivity extends Activity {
 				i.putExtra("nameTable", nomeTabela);
 				i.putExtra("tablesList", namesTables);
 				i.putExtra("DBName", DBName);
+				i.putExtra("listaAlteracao", listaAlteracao);
 				startActivity(i);
 			}
 		});
@@ -230,6 +234,8 @@ public class PopUpNewColumnActivity extends Activity {
 						Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
 						i.putExtra("nameTable", nomeTabela);
 						i.putExtra("tablesList", namesTables);
+						i.putExtra("DBName", DBName);
+						i.putExtra("listaAlteracao", listaAlteracao);
 						startActivity(i);
 					}else{
 						Toast.makeText(getBaseContext(), "It's not possible to create the column", Toast.LENGTH_SHORT);

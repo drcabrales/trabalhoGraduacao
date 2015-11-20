@@ -1,12 +1,19 @@
 package br.com.ufpe;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import br.com.ufpe.objects.Alteracao;
 import br.com.ufpe.objects.Tabela;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +43,10 @@ public class NewTableActivity extends Activity {
 
 	//banco de dados do sistema
 	private DBHelper database;
+	
+	//alteração em alguma tabela
+	private String nomeTabelaAAlterar;
+	private ArrayList<Alteracao> listaAlteracao;
 		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +83,7 @@ public class NewTableActivity extends Activity {
 			}
 		});
 		
+		//clique para ir para a tela de listagem de colunas da tabela
 		listTables.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -83,8 +96,20 @@ public class NewTableActivity extends Activity {
 				i.putExtra("nameTable", (String) parent.getAdapter().getItem(position));
 				i.putExtra("tablesList", namesTables);
 				i.putExtra("DBName", nomeDB);
+				i.putExtra("listaAlteracao", listaAlteracao);
 				startActivity(i);
 				
+			}
+		});
+		
+		//clique para aparecer a opção de editar a tabela
+		listTables.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				nomeTabelaAAlterar = (String) parent.getAdapter().getItem(position);
+				return false;
 			}
 		});
 		
@@ -118,6 +143,66 @@ public class NewTableActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
+		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.add("Edit");
+		menu.add("Delete");
+		
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item){
+		super.onContextItemSelected(item);
+		
+		if(item.getTitle().equals("Edit")){
+			//escolha de edição no menu de tabelas
+			// get prompts.xml view
+			LayoutInflater li = LayoutInflater.from(this);
+			View promptsView = li.inflate(R.layout.prompts, null);
+
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+					this);
+
+			// set prompts.xml to alertdialog builder
+			alertDialogBuilder.setView(promptsView);
+
+			final EditText userInput = (EditText) promptsView
+					.findViewById(R.id.editTextDialogUserInput);
+
+			// set dialog message
+			alertDialogBuilder
+				.setCancelable(false)
+				.setPositiveButton("OK",
+				  new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog,int id) {
+					// get user input and set it to result
+					// edit text
+				    listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null));
+					database.updateTabela(nomeTabelaAAlterar, userInput.getText().toString(), nomeDB);
+				    }
+				  })
+				.setNegativeButton("Cancel",
+				  new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog,int id) {
+					dialog.cancel();
+				    }
+				  });
+
+			// create alert dialog
+			AlertDialog alertDialog = alertDialogBuilder.create();
+
+			// show it
+			alertDialog.show();
+		}else{
+			//escolha de delete no menu de tabelas
+			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null));
+			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
+		}
+		
+		return true;
+	}
+	
 	public void iniciarComponentes(){
 		
 		database = new DBHelper(getBaseContext());
@@ -149,6 +234,10 @@ public class NewTableActivity extends Activity {
 			}
 		};
 		listTables.setAdapter(adapter);
+		
+		//registrando para no clique longo aparecer menu de contexto
+		registerForContextMenu(listTables);
+		listaAlteracao = new ArrayList<Alteracao>();
 		
 	}
 	

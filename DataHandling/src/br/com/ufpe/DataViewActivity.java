@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.ufpe.objects.Alteracao;
 import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
 import android.R.color;
@@ -56,6 +57,10 @@ public class DataViewActivity extends Activity {
 	private Button btnNovoDado;
 	
 	private Map<Integer, String> auxDadosBlob;
+	
+	//alteracao de esquema
+	private ArrayList<Alteracao> listaAlteracao;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,7 @@ public class DataViewActivity extends Activity {
 		nameTabela = i.getExtras().getString("nameTable");
 		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
 		DBName = i.getExtras().getString("DBName");
+		listaAlteracao = (ArrayList<Alteracao>) i.getExtras().get("listaAlteracao");
 		iniciarComponentes();
 
 		//nesse ponto já sabemos o nome da tabela e as colunas. 
@@ -275,7 +281,8 @@ public class DataViewActivity extends Activity {
 		btnNovoDado = (Button) findViewById(R.id.btnNewData);
 
 		//preenchendo as colunas da visualização
-		colunas = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
+		Intent intent = getIntent();
+		colunas = (ArrayList<Coluna>) intent.getExtras().get("columnsList");
 
 		tabelas = new ArrayList<Tabela>();
 		for (int i = 0; i < namesTables.size(); i++) {
@@ -283,6 +290,13 @@ public class DataViewActivity extends Activity {
 		}
 
 		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
+		
+		//depois que cria o banco de dados padrao, verifica se tem alterações
+		
+		//erro proposital de lembrança TODO
+		//ve se a lista de alteracoes ta vazia
+			//senao usa o update, com a logica de alteracoes
+			//coleta novamente o nome da tabela atual e suas colunas
 		
 		auxDadosBlob = new HashMap<Integer, String>();
 

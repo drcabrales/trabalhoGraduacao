@@ -209,6 +209,30 @@ public class DBHelper extends SQLiteOpenHelper{
         return retorno;
     }
 	
+	public boolean updateTabela(String tabelaAAlterar, String tabela, String DBName) {
+        database = this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("nome", tabela);
+        return database.update("Tabela", initialValues, "nomeBanco" + "= '" + DBName + "' and nome = '" + tabelaAAlterar + "'", null) > 0;
+    }
+	
+	public void deleteTabela(String tabela, String DBName){
+        database = this.getWritableDatabase();
+        database.execSQL("delete from Tabela where nome = '" + tabela + "' and nomeBanco = '"+ DBName +"';");
+    }
+	
+	public boolean updateColuna(String colunaAAlterar, String coluna, String nomeTabela) {
+        database = this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("nome", coluna);
+        return database.update("Tabela", initialValues, "nomeTabela" + "= '" + nomeTabela + "' and nome = '" + colunaAAlterar + "'", null) > 0;
+    }
+	
+	public void deleteColuna(String coluna, String nomeTabela){
+        database = this.getWritableDatabase();
+        database.execSQL("delete from Tabela where nome = '" + coluna + "' and nomeTabela = '"+ nomeTabela +"';");
+    }
+	
 	//método responsável por criar os bancos de dados do usuário
 	public DBHelperUsuario createUserDatabase(Context context, String nomeBanco, ArrayList<Tabela> tabelas, ArrayList<Coluna> colunas){
 		DBHelperUsuario helperUsu = new DBHelperUsuario(context, nomeBanco, tabelas, colunas);
