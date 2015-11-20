@@ -385,6 +385,7 @@ public class NewDataActivity extends Activity {
 				i.putExtra("DBName", DBName);
 				i.putExtra("nameTable", tableName);
 				i.putExtra("tablesList", namesTables);
+				i.putExtra("columnsList", colunas);
 				startActivity(i);
 			}
 		});
