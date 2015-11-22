@@ -218,7 +218,7 @@ public class DBHelper extends SQLiteOpenHelper{
 	
 	public void updateReferenciaColunaTabela(String nomeNovaTabela, String nomeVelhaTabela){ //quando der update numa tabela, tem que dar update em suas referencias na coluna no campo "nomeTabela"
 		 database = this.getWritableDatabase();
-		 database.execSQL("update table Coluna set nomeTabela = " + nomeNovaTabela + " where nomeTabela like " + nomeVelhaTabela);
+		 database.execSQL("update Coluna set nomeTabela = '" + nomeNovaTabela + "' where nomeTabela = '" + nomeVelhaTabela + "'");
 	}
 	
 	public void deleteTabela(String tabela, String DBName){
