@@ -108,7 +108,8 @@ public class NewColumnActivity extends Activity {
 				database.createUserDatabase(getBaseContext(), DBName, tabelas, colunas);*/
 				//------------------------------------------------------------------------
 				
-				
+				//-------------- TALVEZ DESCOMENTAR ISSO ---------
+				/*
 				//faz as alterações necessárias no banco
 				for (int j = 0; j < listaAlteracao.size(); j++) {
 					if(listaAlteracao.get(j).getTipoAlteracao().equals("altNomeColuna")){
@@ -116,7 +117,7 @@ public class NewColumnActivity extends Activity {
 					}else if(listaAlteracao.get(j).getTipoAlteracao().equals("delColuna")){
 						database.deleteColuna(listaAlteracao.get(j).getDelColuna(), nomeTabela);
 					}
-				}
+				}*/
 
 				//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
 				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
@@ -177,6 +178,13 @@ public class NewColumnActivity extends Activity {
 		menu.add("Delete");
 		
 		colunasAlt = new ArrayList<Coluna>();
+		//pegar colunas novamente
+		colunas = new ArrayList<Coluna>();
+		
+		for (int i = 0; i < namesTables.size(); i++) {
+			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabela(namesTables.get(i)));
+		}
+		
 		for (int i = 0; i < colunas.size(); i++) {
 			if(colunas.get(i).getNomeTabela().equals(nomeTabela)){
 				Coluna aux = new Coluna();
@@ -233,8 +241,7 @@ public class NewColumnActivity extends Activity {
 						}
 					}
 				    
-				    //FAZER ISSO NO SAVE AND VIEW
-				    //database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
+				    database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
 				    }
 				  })
 				.setNegativeButton("Cancel",
@@ -259,8 +266,7 @@ public class NewColumnActivity extends Activity {
 				}
 			}
 			
-			//FAZER ISSO NO SAVE AND VIEW
-			//database.deleteColuna(nomeColunaAAlterar, nomeTabela);
+			database.deleteColuna(nomeColunaAAlterar, nomeTabela);
 		}
 		
 		return true;
