@@ -54,6 +54,8 @@ public class NewColumnActivity extends Activity {
 	//alteracao de dados
 	private ArrayList<Alteracao> listaAlteracao;
 	private String nomeColunaAAlterar;
+	private ArrayList<String> namesTablesAlt;
+	private ArrayList<Coluna> colunasAlt;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +106,17 @@ public class NewColumnActivity extends Activity {
 
 				//chamando método de criação do banco com tabelas e colunas
 				database.createUserDatabase(getBaseContext(), DBName, tabelas, colunas);*/
+				//------------------------------------------------------------------------
+				
+				
+				//faz as alterações necessárias no banco
+				for (int j = 0; j < listaAlteracao.size(); j++) {
+					if(listaAlteracao.get(j).getTipoAlteracao().equals("altNomeColuna")){
+						 database.updateColuna(listaAlteracao.get(j).getNomeVelhoColuna(), listaAlteracao.get(j).getNomeNovoColuna(), nomeTabela);
+					}else if(listaAlteracao.get(j).getTipoAlteracao().equals("delColuna")){
+						database.deleteColuna(listaAlteracao.get(j).getDelColuna(), nomeTabela);
+					}
+				}
 
 				//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
 				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
@@ -163,6 +176,23 @@ public class NewColumnActivity extends Activity {
 		menu.add("Edit");
 		menu.add("Delete");
 		
+		colunasAlt = new ArrayList<Coluna>();
+		for (int i = 0; i < colunas.size(); i++) {
+			if(colunas.get(i).getNomeTabela().equals(nomeTabela)){
+				Coluna aux = new Coluna();
+				aux.setAutoincrement(colunas.get(i).isAutoincrement());
+				aux.setFK(colunas.get(i).isFK());
+				aux.setNome(colunas.get(i).getNome());
+				aux.setNomeColunaFK(colunas.get(i).getNomeColunaFK());
+				aux.setNomeTabela(colunas.get(i).getNomeTabela());
+				aux.setNomeTabelaFK(colunas.get(i).getNomeTabelaFK());
+				aux.setPK(colunas.get(i).isPK());
+				aux.setTipo(colunas.get(i).getTipo());
+				aux.setTipoBlob(colunas.get(i).getTipoBlob());
+				colunasAlt.add(aux);
+			}
+		}
+		
 	}
 	
 	@Override
@@ -192,8 +222,19 @@ public class NewColumnActivity extends Activity {
 				    public void onClick(DialogInterface dialog,int id) {
 					// get user input and set it to result
 					// edit text
-				    listaAlteracao.add(new Alteracao("altNomeColuna", nomeColunaAAlterar, userInput.getText().toString(), null, null, null, null));
-				    database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), DBName);
+				    listaAlteracao.add(new Alteracao("altNomeColuna", null, null, nomeColunaAAlterar, userInput.getText().toString(), null, null, namesTables, colunasAlt, DBName));
+				    
+				    for (int i = 0; i < colunasAlt.size(); i++) {
+						if(colunasAlt.get(i).getNome().equals(nomeColunaAAlterar)){
+							Coluna aux = colunasAlt.get(i);
+							aux.setNome(userInput.getText().toString());
+							colunasAlt.remove(i);
+							colunasAlt.add(aux);
+						}
+					}
+				    
+				    //FAZER ISSO NO SAVE AND VIEW
+				    //database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
 				    }
 				  })
 				.setNegativeButton("Cancel",
@@ -210,8 +251,16 @@ public class NewColumnActivity extends Activity {
 			alertDialog.show();
 		}else{
 			//escolha de delete no menu de tabelas
-			listaAlteracao.add(new Alteracao("delColuna", null, null, null, null, nomeColunaAAlterar, null));
-			database.deleteColuna(nomeColunaAAlterar, DBName);
+			listaAlteracao.add(new Alteracao("delColuna", null, null, null, null, null, nomeColunaAAlterar, namesTables, colunasAlt, DBName));
+			
+			for (int i = 0; i < colunasAlt.size(); i++) {
+				if(colunasAlt.get(i).getNome().equals(nomeColunaAAlterar)){
+					colunasAlt.remove(i);
+				}
+			}
+			
+			//FAZER ISSO NO SAVE AND VIEW
+			//database.deleteColuna(nomeColunaAAlterar, nomeTabela);
 		}
 		
 		return true;
@@ -232,9 +281,16 @@ public class NewColumnActivity extends Activity {
 
 		//preencher namesColumns com as colunas vindas do sistema (que o usuário já inseriu previamente)
 		namesColumns = new ArrayList<String>();
-		colunas = (ArrayList<Coluna>) database.getColunasByTabela(nomeTabela);
+		colunas = new ArrayList<Coluna>();
+		
+		for (int i = 0; i < namesTables.size(); i++) {
+			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabela(namesTables.get(i)));
+		}
+		
 		for (int i = 0; i < colunas.size(); i++) {
-			namesColumns.add(colunas.get(i).getNome());
+			if(colunas.get(i).getNomeTabela().equals(nomeTabela)){
+				namesColumns.add(colunas.get(i).getNome());				
+			}
 		}
 
 		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesColumns){
@@ -249,6 +305,12 @@ public class NewColumnActivity extends Activity {
 		listColumns.setAdapter(adapter);
 		//registrando para no clique longo aparecer menu de contexto
 		registerForContextMenu(listColumns);
+		
+		
+		namesTablesAlt = new ArrayList<String>();
+		for (int i = 0; i < namesTables.size(); i++) {
+			namesTablesAlt.add(namesTables.get(i));
+		}
 
 	}
 }

@@ -46,6 +46,7 @@ public class DataViewActivity extends Activity {
 	private ScrollView scrollVertical;
 
 	private ArrayList<Coluna> colunas;
+	private ArrayList<Coluna> colunasParaVisualizacao;
 	private ArrayList<String> namesTables;
 	private ArrayList<Tabela> tabelas;
 	private String nameTabela;
@@ -80,11 +81,11 @@ public class DataViewActivity extends Activity {
 		//preenchendo o header com o nome das tabelas
 		TableRow headerNomesColunas = new TableRow(this);
 		//headerNomesColunas.setBackgroundColor(Color.rgb(136, 93, 178));
-		for (int j = 0; j < colunas.size(); j++) {
+		for (int j = 0; j < colunasParaVisualizacao.size(); j++) {
 			TextView nomeColuna = new TextView(this);
 			nomeColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 			nomeColuna.setPadding(10, 10, 10, 10);
-			nomeColuna.setText(colunas.get(j).getNome());
+			nomeColuna.setText(colunasParaVisualizacao.get(j).getNome());
 			nomeColuna.setTextColor(Color.WHITE);
 			nomeColuna.setGravity(Gravity.CENTER);
 			headerNomesColunas.addView(nomeColuna);
@@ -100,43 +101,43 @@ public class DataViewActivity extends Activity {
 
 		//for para adicionar os table row de dados no table layout datatable
 		//tem que pegar a lista de dados para usar nesse for. aqui vai entrar tb a logica do multimidia (botao diferenciado)
-		final Map<String, Object> dados = dbHelperUsuario.getAllDataFromTable(nameTabela, colunas);
+		final Map<String, Object> dados = dbHelperUsuario.getAllDataFromTable(nameTabela, colunasParaVisualizacao);
 
-		for (int j = 0; j < (dados.size()/colunas.size()); j++) { //quantidade de linhas (dados totais / colunas)
+		for (int j = 0; j < (dados.size()/colunasParaVisualizacao.size()); j++) { //quantidade de linhas (dados totais / colunas)
 			TableRow linha = new TableRow(this);
 
-			for (int k = 0; k < colunas.size(); k++) { //quantidade colunas
+			for (int k = 0; k < colunasParaVisualizacao.size(); k++) { //quantidade colunas
 				TextView dadoColuna = new TextView(this);
 				dadoColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 				dadoColuna.setPadding(10, 10, 10, 10);
 
-				if(!colunas.get(k).getTipo().equals("BLOB")){
-					if(colunas.get(k).getTipo().equals("Varchar") || colunas.get(k).getTipo().equals("Text")){
-						String hashmapkey = colunas.get(k).getNome() + j+ k;
+				if(!colunasParaVisualizacao.get(k).getTipo().equals("BLOB")){
+					if(colunasParaVisualizacao.get(k).getTipo().equals("Varchar") || colunasParaVisualizacao.get(k).getTipo().equals("Text")){
+						String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 						dadoColuna.setText((String) dados.get(hashmapkey));
-					}else if(colunas.get(k).getTipo().equals("Integer")){
-						String hashmapkey = colunas.get(k).getNome() + j+ k;
+					}else if(colunasParaVisualizacao.get(k).getTipo().equals("Integer")){
+						String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 						dadoColuna.setText((Integer) dados.get(hashmapkey) + "");
-					}else if(colunas.get(k).getTipo().equals("Double")){
-						String hashmapkey = colunas.get(k).getNome() + j+ k;
+					}else if(colunasParaVisualizacao.get(k).getTipo().equals("Double")){
+						String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 						dadoColuna.setText((Double) dados.get(hashmapkey) + "");
-					}else if(colunas.get(k).getTipo().equals("Float")){
-						String hashmapkey = colunas.get(k).getNome() + j+ k;
+					}else if(colunasParaVisualizacao.get(k).getTipo().equals("Float")){
+						String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 						dadoColuna.setText((Float) dados.get(hashmapkey) + "");
-					}else if(colunas.get(k).getTipo().equals("Datetime")){
-						String hashmapkey = colunas.get(k).getNome() + j+ k;
+					}else if(colunasParaVisualizacao.get(k).getTipo().equals("Datetime")){
+						String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 						SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 						dadoColuna.setText(format.format(dados.get(hashmapkey)) + "");
 					}else{
 						//boolean
-						String hashmapkey = colunas.get(k).getNome() + j+ k;
+						String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 						dadoColuna.setText((Boolean) dados.get(hashmapkey) + "");
 					}
 
 				}else{
 					//coloca a indicação do blob na tabela
 					//por enquanto fica o path, pra ver se deu certo
-					String hashmapkey = colunas.get(k).getNome() + j+ k;
+					String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
 					
 					final String path = (String) dados.get(hashmapkey) + "";
 					
@@ -215,7 +216,7 @@ public class DataViewActivity extends Activity {
 
 				dadoColuna.setTextColor(Color.WHITE);
 				dadoColuna.setGravity(Gravity.CENTER);
-				if(!colunas.get(k).getTipo().equals("BLOB")){
+				if(!colunasParaVisualizacao.get(k).getTipo().equals("BLOB")){
 					linha.addView(dadoColuna);
 				}
 
@@ -238,7 +239,7 @@ public class DataViewActivity extends Activity {
 				Intent i = new Intent(getBaseContext(), NewDataActivity.class);
 				i.putExtra("DBName", DBName);
 				i.putExtra("TableName", nameTabela);
-				i.putExtra("ListaColunas", colunas);
+				i.putExtra("ListaColunas", colunasParaVisualizacao);
 				i.putExtra("tablesList", namesTables);
 				i.putExtra("ListaTabelas", tabelas);
 				startActivity(i);
@@ -283,20 +284,36 @@ public class DataViewActivity extends Activity {
 		//preenchendo as colunas da visualização
 		Intent intent = getIntent();
 		colunas = (ArrayList<Coluna>) intent.getExtras().get("columnsList");
+		
+		//colunas especificas da tabela clicada
+		colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
 
 		tabelas = new ArrayList<Tabela>();
 		for (int i = 0; i < namesTables.size(); i++) {
 			tabelas.add(new Tabela(namesTables.get(i), DBName));
 		}
 
+		//para criar o DB, tem que usar todas as tabelas e colunas
 		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
 		
 		//depois que cria o banco de dados padrao, verifica se tem alterações
 		
-		//erro proposital de lembrança TODO
 		//ve se a lista de alteracoes ta vazia
-			//senao usa o update, com a logica de alteracoes
-			//coleta novamente o nome da tabela atual e suas colunas
+		if(listaAlteracao != null){
+			if(listaAlteracao.size() > 0){
+				//tem alteração, então atualiza
+				dbHelperUsuario.onUpdateSchema(listaAlteracao);
+				
+				//pegar "tabelas" e "colunas" novas para os atributos correspondentes, alem de mudar namestables
+				tabelas = (ArrayList<Tabela>) database.getAllNomesTabelas();
+				namesTables = new ArrayList<String>();
+				for (int i = 0; i < tabelas.size(); i++) {
+					namesTables.add(tabelas.get(i).getNome());
+				}
+				colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
+				
+			}
+		}
 		
 		auxDadosBlob = new HashMap<Integer, String>();
 

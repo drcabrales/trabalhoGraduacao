@@ -55,6 +55,7 @@ public class NewTableActivity extends Activity {
 		
 		Intent i = getIntent();
 		nomeDB = i.getExtras().getString("DBName");
+		listaAlteracao = new ArrayList<Alteracao>();
 		iniciarComponentes();
 		
 		//pega o nome do banco selecionado via extras do intent
@@ -178,8 +179,9 @@ public class NewTableActivity extends Activity {
 				    public void onClick(DialogInterface dialog,int id) {
 					// get user input and set it to result
 					// edit text
-				    listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null));
+				    listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null, null, null, null));
 					database.updateTabela(nomeTabelaAAlterar, userInput.getText().toString(), nomeDB);
+					database.updateReferenciaColunaTabela(userInput.getText().toString(), nomeTabelaAAlterar);
 				    }
 				  })
 				.setNegativeButton("Cancel",
@@ -196,7 +198,7 @@ public class NewTableActivity extends Activity {
 			alertDialog.show();
 		}else{
 			//escolha de delete no menu de tabelas
-			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null));
+			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null));
 			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
 		}
 		
@@ -237,7 +239,6 @@ public class NewTableActivity extends Activity {
 		
 		//registrando para no clique longo aparecer menu de contexto
 		registerForContextMenu(listTables);
-		listaAlteracao = new ArrayList<Alteracao>();
 		
 	}
 	

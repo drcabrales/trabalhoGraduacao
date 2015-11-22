@@ -1,6 +1,7 @@
 package br.com.ufpe.objects;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Alteracao implements Serializable{
 	/**
@@ -24,6 +25,10 @@ public class Alteracao implements Serializable{
 	
 	private String delTabela;
 	private String delColuna;
+	
+	private ArrayList<String> tabelas;
+	private ArrayList<Coluna> colunas;
+	private String DBName;
 	
 	public String getTipoAlteracao() {
 		return tipoAlteracao;
@@ -81,7 +86,31 @@ public class Alteracao implements Serializable{
 		this.delColuna = delColuna;
 	}
 
-	public Alteracao(String tipoAlteracao, String nomeVelhoTabela, String nomeNovoTabela, String nomeVelhoColuna, String nomeNovoColuna, String delTabela, String delColuna){
+	public ArrayList<String> getTabelas() {
+		return tabelas;
+	}
+
+	public void setTabelas(ArrayList<String> tabelas) {
+		this.tabelas = tabelas;
+	}
+
+	public ArrayList<Coluna> getColunas() {
+		return colunas;
+	}
+
+	public void setColunas(ArrayList<Coluna> colunas) {
+		this.colunas = colunas;
+	}
+
+	public String getDBName() {
+		return DBName;
+	}
+
+	public void setDBName(String dBName) {
+		DBName = dBName;
+	}
+
+	public Alteracao(String tipoAlteracao, String nomeVelhoTabela, String nomeNovoTabela, String nomeVelhoColuna, String nomeNovoColuna, String delTabela, String delColuna, ArrayList<String> tabelas, ArrayList<Coluna> colunas, String DBName){
 		this.delColuna = delColuna;
 		this.delTabela = delTabela;
 		this.nomeNovoColuna = nomeNovoColuna;
@@ -89,5 +118,8 @@ public class Alteracao implements Serializable{
 		this.nomeVelhoColuna = nomeVelhoColuna;
 		this.nomeVelhoTabela = nomeVelhoTabela;
 		this.tipoAlteracao = tipoAlteracao;
+		this.colunas = colunas;
+		this.tabelas = tabelas;
+		this.DBName = DBName;
 	}
 }

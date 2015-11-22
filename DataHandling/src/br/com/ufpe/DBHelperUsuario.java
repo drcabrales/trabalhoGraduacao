@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import br.com.ufpe.objects.Alteracao;
 import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
 import android.content.ContentValues;
@@ -137,6 +138,157 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 		}
 		onCreate(db); 
 	}
+	
+	public void onUpdateSchema(ArrayList<Alteracao> listAlteracao){
+		//pega o database
+		database = getWritableDatabase();
+		//por segurança, deleta a tabela auxiliar se existir
+		database.execSQL("DROP TABLE IF EXISTS auxEditColumn");
+		
+		//ve o tipo da alteracao
+		//para cada tipo, monta um execSQL diferente, com alter
+		for (int i = 0; i < listAlteracao.size(); i++) {
+			Alteracao aux = listAlteracao.get(i);
+			
+			if(aux.getTipoAlteracao().equals("altNomeTabela")){
+				database.execSQL("alter table " +aux.getNomeVelhoTabela() + "rename to " + aux.getNomeNovoTabela());
+			}else if(aux.getTipoAlteracao().equals("delTabela")){
+				database.execSQL("DROP TABLE IF EXISTS " + aux.getDelTabela());
+			}else if(aux.getTipoAlteracao().equals("altNomeColuna")){
+				//pega o nome da coluna que vai ser alterada
+				String nomeColunaEdit = aux.getNomeVelhoColuna();
+				
+				//pega a lista de colunas
+				ArrayList<Coluna> auxColunas = aux.getColunas();
+				
+				//pega o nome do banco de dados
+				String auxBanco = aux.getDBName();
+				
+				//pega o nome da tabela e do banco da coluna e coloca nessa lista como objeto tabela
+				ArrayList<Tabela> auxTabelas = new ArrayList<Tabela>();
+				Tabela newTable = new Tabela("auxEditColumn", auxBanco);
+				auxTabelas.add(newTable);
+				
+				//pega o nome da tabela atual da coluna a ser editada
+				String tabelaAtual = "";
+				
+				//pega todas os nomes de colunas, separadas por virgula, em unica string
+				String stringColunasVelhas = "";
+				String stringColunasNovas = "";
+				
+				//muda a coluna que quer ser editada para ter o novo nome e nova tabela
+				for (int j = 0; j < auxColunas.size(); j++) {
+					tabelaAtual = auxColunas.get(j).getNomeTabela();
+					
+					if(j+1 >= auxColunas.size()){ //sem virgula
+						if(auxColunas.get(j).getNome().equals(aux.getNomeNovoColuna())){ //se o atual da lista e o que sabemos que vamos editar baterem, salvamos eles com o formato novo e velho nas strings
+							stringColunasVelhas = stringColunasVelhas + aux.getNomeVelhoColuna();
+							stringColunasNovas = stringColunasNovas + aux.getNomeNovoColuna();
+						}else{
+							stringColunasVelhas = stringColunasVelhas + auxColunas.get(j).getNome();
+							stringColunasNovas = stringColunasNovas + auxColunas.get(j).getNome();
+						}
+					}else{ //com virgula
+						if(auxColunas.get(j).getNome().equals(aux.getNomeNovoColuna())){ //se o atual da lista e o que sabemos que vamos editar baterem, salvamos eles com o formato novo e velho nas strings
+							stringColunasVelhas = stringColunasVelhas + aux.getNomeVelhoColuna() + ",";
+							stringColunasNovas = stringColunasNovas + aux.getNomeNovoColuna() + ",";
+						}else{
+							stringColunasVelhas = stringColunasVelhas + auxColunas.get(j).getNome() + ",";
+							stringColunasNovas = stringColunasNovas + auxColunas.get(j).getNome() + ",";
+						}
+					}
+					
+					auxColunas.get(j).setNomeTabela("auxEditColumn");
+				}
+				
+				//cria uma tabela auxiliar e passa os dados da primeira tabela pra segunda
+				criarTabela(auxColunas, auxTabelas);
+				
+				//passar os dados da tabela velha pra a aux
+				//DANDO ERRO COM DOIS EDIT: COMO ELE TÁ PEGANDO A PARTE CADA LISTA DE COLUNAS, APENAS COM A SUA ALTERADA,
+				//NAO TA ENXERGANDO EDIÇÕES ANTERIORES, PROVAVELMENTE NEM DELETES. ARRUMAR ISSO E PGAR UMA LISTA DE COLUNAS MAIS ATUALIZADA POSSIVEL
+				database.execSQL("INSERT INTO auxEditColumn(" + stringColunasNovas + ") SELECT "
+			            + stringColunasVelhas + " FROM " + tabelaAtual + ";");
+				
+				//deleta a primeira tabela (verificar se deu erro ou n por foreign key)
+				try{
+					database.execSQL("DROP TABLE IF EXISTS " + tabelaAtual);
+				}catch(Exception e){
+					//se entrar aqui, deu erro pra deletar
+					//avisar que a atualização falhou
+				}
+				
+				//renomear nova tabela para nome antigo
+				database.execSQL("alter table auxEditColumn rename to " + tabelaAtual);
+				
+			}else{
+				//delColuna
+				//pega o nome da coluna que vai ser deletada
+				String nomeColunaDel = aux.getDelColuna();
+				
+				//pega a lista de colunas
+				ArrayList<Coluna> auxColunas = aux.getColunas();
+				
+				//pega o nome do banco de dados
+				String auxBanco = aux.getDBName();
+				
+				//pega o nome da tabela e do banco da coluna e coloca nessa lista como objeto tabela
+				ArrayList<Tabela> auxTabelas = new ArrayList<Tabela>();
+				Tabela newTable = new Tabela("auxEditColumn", auxBanco);
+				auxTabelas.add(newTable);
+				
+				//pega o nome da tabela atual da coluna a ser editada
+				String tabelaAtual = "";
+				
+				//pega todas os nomes de colunas, separadas por virgula, em unica string
+				String stringColunas = "";
+				
+				//muda a coluna que quer ser editada para ter o novo nome e nova tabela
+				for (int j = 0; j < auxColunas.size(); j++) {
+					tabelaAtual = auxColunas.get(j).getNomeTabela();
+					if(!auxColunas.get(j).getNome().equals(nomeColunaDel)){//não pega a coluna que vai ser deletada
+						if(j+1 >= auxColunas.size()){
+							stringColunas = stringColunas + auxColunas.get(j).getNome();
+						}else{
+							stringColunas = stringColunas + auxColunas.get(j).getNome() + ",";
+						}
+					}else{
+						if(j+1 >= auxColunas.size()){
+							//tirando uma possivel virgula no final
+							stringColunas = stringColunas.substring(0, stringColunas.length()-1);
+						}
+					}
+					
+					auxColunas.get(j).setNomeTabela("auxEditColumn");
+				}
+				
+				//retirar a coluna que se deseja eliminar em auxColunas
+				for (int j = 0; j < auxColunas.size(); j++) {
+					if(auxColunas.get(j).getNome().equals(aux.getDelColuna())){
+						auxColunas.remove(j);
+					}
+				}
+				
+				//cria uma tabela auxiliar e passa os dados da primeira tabela pra segunda
+				criarTabela(auxColunas, auxTabelas);
+				
+				//passar os dados da tabela velha pra a aux
+				database.execSQL("INSERT INTO auxEditColumn(" + stringColunas + ") SELECT "
+			            + stringColunas + " FROM " + tabelaAtual + ";");
+				
+				//deleta a primeira tabela (verificar se deu erro ou n por foreign key)
+				try{
+					database.execSQL("DROP TABLE IF EXISTS " + tabelaAtual);
+				}catch(Exception e){
+					//se entrar aqui, deu erro pra deletar
+					//avisar que a atualização falhou
+				}
+				
+				//renomear nova tabela para nome antigo
+				database.execSQL("alter table auxEditColumn rename to " + tabelaAtual);
+			}
+		}
+	}
 
 	public void callOnCreate(){
 		database = this.getWritableDatabase();
@@ -212,5 +364,89 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			}while(cursor.moveToNext());
 		}
 		return retorno;
+	}
+	
+	public void criarTabela(ArrayList<Coluna> colunas, ArrayList<Tabela> tabelas){
+		ArrayList<String> criacaoTabelas = new ArrayList<String>();
+		String createTable = "";
+		boolean entrouAutoincrement = false;
+
+		for (int i = 0; i < tabelas.size(); i++) {
+			createTable = "";
+			createTable = "create table " + tabelas.get(i).getNome() + " (";
+
+			//for para adicionar as colunas na string
+			for (int j = 0; j < colunas.size(); j++) {
+				//se a coluna pertencer a tabela em questão
+				if(colunas.get(j).getNomeTabela().equals(tabelas.get(i).getNome())){
+					//tratamento do blob para virar apenas a url 
+					createTable = createTable + colunas.get(j).getNome() +" " + (colunas.get(j).getTipo().equals("BLOB") ? "Varchar":colunas.get(j).getTipo());
+
+					//se for chave primária, acrescenta o not null
+					//ATENÇÃO: SE FOR AUTOINCREMENTO, TIRA A NECESSIDADE DE TER CHAVE PRIMÁRIA COMPOSTA (ver essa lógica)
+					if(colunas.get(j).isPK()){
+						if(colunas.get(j).isAutoincrement()){
+							//ele só deve entrar aqui uma vez, mas a verificação disso vai
+							//ser no momento da inserção das colunas!!
+							//VER ESSA LOGICA
+							createTable = createTable + " primary key autoincrement, ";
+							entrouAutoincrement = true;
+						}else{
+							createTable = createTable + " not null, ";
+						}
+					}else{
+						createTable = createTable + ",";
+					}
+				}
+			}
+
+			if(!entrouAutoincrement){
+
+				createTable = createTable + " primary key (";
+
+				//for para adicionar as chaves primárias
+				for (int j = 0; j < colunas.size(); j++) {
+					//se a coluna pertencer a tabela em questão
+					if(colunas.get(j).getNomeTabela().equals(tabelas.get(i).getNome())){
+						if(colunas.get(j).isPK()){
+							createTable = createTable + colunas.get(j).getNome() + ", ";
+						}
+					}
+				}
+
+				//tirando a virgula do final
+				createTable = createTable.substring(0,createTable.length()-2) + "), ";
+			}
+
+
+			boolean entrouForeignKey = false;
+
+			//for para as chaves estrangeiras
+			for (int j = 0; j < colunas.size(); j++) {
+				if(colunas.get(j).getNomeTabela().equals(tabelas.get(i).getNome()) && colunas.get(j).isFK()){
+					entrouForeignKey = true;
+					createTable = createTable + "foreign key (" + colunas.get(j).getNome() + ") references " + 
+							colunas.get(j).getNomeTabelaFK() + "(" + colunas.get(j).getNomeColunaFK() + "), ";
+				}
+			}
+
+			if(entrouForeignKey){
+				//tirando a virgula do final
+				createTable = createTable.substring(0,createTable.length()-2) + "); ";
+			}else{
+				createTable = createTable.substring(0,createTable.length()-1) + "); ";
+			}
+
+			if(!entrouAutoincrement){
+				createTable = createTable.substring(0,createTable.length()-4) + "); ";
+			}
+
+			criacaoTabelas.add(createTable);
+			entrouAutoincrement = false;
+		}
+
+		for (int j = 0; j < criacaoTabelas.size(); j++) {
+			database.execSQL(criacaoTabelas.get(j));
+		}
 	}
 }

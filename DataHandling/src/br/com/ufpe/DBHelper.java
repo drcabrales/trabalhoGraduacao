@@ -216,6 +216,11 @@ public class DBHelper extends SQLiteOpenHelper{
         return database.update("Tabela", initialValues, "nomeBanco" + "= '" + DBName + "' and nome = '" + tabelaAAlterar + "'", null) > 0;
     }
 	
+	public void updateReferenciaColunaTabela(String nomeNovaTabela, String nomeVelhaTabela){ //quando der update numa tabela, tem que dar update em suas referencias na coluna no campo "nomeTabela"
+		 database = this.getWritableDatabase();
+		 database.execSQL("update table Coluna set nomeTabela = " + nomeNovaTabela + " where nomeTabela like " + nomeVelhaTabela);
+	}
+	
 	public void deleteTabela(String tabela, String DBName){
         database = this.getWritableDatabase();
         database.execSQL("delete from Tabela where nome = '" + tabela + "' and nomeBanco = '"+ DBName +"';");
@@ -225,12 +230,12 @@ public class DBHelper extends SQLiteOpenHelper{
         database = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put("nome", coluna);
-        return database.update("Tabela", initialValues, "nomeTabela" + "= '" + nomeTabela + "' and nome = '" + colunaAAlterar + "'", null) > 0;
+        return database.update("Coluna", initialValues, "nomeTabela" + "= '" + nomeTabela + "' and nome = '" + colunaAAlterar + "'", null) > 0;
     }
 	
 	public void deleteColuna(String coluna, String nomeTabela){
         database = this.getWritableDatabase();
-        database.execSQL("delete from Tabela where nome = '" + coluna + "' and nomeTabela = '"+ nomeTabela +"';");
+        database.execSQL("delete from Coluna where nome = '" + coluna + "' and nomeTabela = '"+ nomeTabela +"';");
     }
 	
 	//método responsável por criar os bancos de dados do usuário
