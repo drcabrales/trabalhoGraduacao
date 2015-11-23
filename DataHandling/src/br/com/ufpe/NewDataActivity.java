@@ -48,6 +48,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
+import br.com.ufpe.objects.Alteracao;
 import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
 
@@ -86,6 +87,8 @@ public class NewDataActivity extends Activity {
 	private int ordemEscolhida;
 	
 	private String tipoBlobEscolhido;
+	
+	private ArrayList<Alteracao> listaAlteracao;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -386,6 +389,7 @@ public class NewDataActivity extends Activity {
 				i.putExtra("nameTable", tableName);
 				i.putExtra("tablesList", namesTables);
 				i.putExtra("columnsList", colunas);
+				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
 				startActivity(i);
 			}
 		});
@@ -490,6 +494,8 @@ public class NewDataActivity extends Activity {
 		auxNomesColunas = new HashMap<Integer, String>();
 		ordemBotaoSelecionarBlob = 0;
 		ordemEscolhida = 0;
+		
+		listaAlteracao = (ArrayList<Alteracao>) i.getExtras().get("listaAlteracao");
 	}
 
 	private void play(Context context, Uri uri) {

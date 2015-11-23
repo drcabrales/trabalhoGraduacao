@@ -30,38 +30,39 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class NewTableActivity extends Activity {
-	
+
 	private EditText edtNewTableName;
 	private Button btnNewTable;
 	private ListView listTables;
 	private TextView txtDBName;
 	private Button btnBack;
 	private ArrayAdapter<String> adapter;
-	
+
 	private ArrayList<String> namesTables;
 	private String nomeDB;
 
 	//banco de dados do sistema
 	private DBHelper database;
-	
+
 	//alteração em alguma tabela
 	private String nomeTabelaAAlterar;
 	private ArrayList<Alteracao> listaAlteracao;
-		
+	private boolean flagBancoCriado;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_new_table);
-		
+
 		Intent i = getIntent();
 		nomeDB = i.getExtras().getString("DBName");
 		listaAlteracao = new ArrayList<Alteracao>();
 		iniciarComponentes();
-		
+
 		//pega o nome do banco selecionado via extras do intent
-		
+
 		btnNewTable.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				/* Nesse clique:
@@ -69,21 +70,39 @@ public class NewTableActivity extends Activity {
 				 * - criar a nova tabela caso não exista (se já existir, informar)
 				 */
 				if(!edtNewTableName.getText().toString().equals("")){
-					boolean criou = criarTabela(edtNewTableName.getText().toString(), nomeDB);
-					
-					if(criou){
-						namesTables.add(edtNewTableName.getText().toString());
-						adapter.notifyDataSetChanged();
-						
-						//não starta nova activity pq ele pode criar n tabelas,
-						//e depois acessar a que deseja para prosseguir
-					}else{
-						Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
+					if(!flagBancoCriado){ //se o banco não foi criado ainda, insere normalmente
+						boolean criou = criarTabela(edtNewTableName.getText().toString(), nomeDB);
+
+						if(criou){
+							namesTables.add(edtNewTableName.getText().toString());
+							adapter.notifyDataSetChanged();
+
+							//não starta nova activity pq ele pode criar n tabelas,
+							//e depois acessar a que deseja para prosseguir
+						}else{
+							Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
+						}
+					}else{ //se o banco já foi criado, a nova tabela entra em alteração
+						Tabela aux = new Tabela(edtNewTableName.getText().toString(), nomeDB);
+						listaAlteracao.add(new Alteracao("addTabela", null, null, null, null, null, null, null, null, null, aux, null));
+
+						//ainda assim cria, mas na hora do save & view tem que verificar se ta na lista de alteração ou não
+						boolean criou = criarTabela(edtNewTableName.getText().toString(), nomeDB);
+
+						if(criou){
+							namesTables.add(edtNewTableName.getText().toString());
+							adapter.notifyDataSetChanged();
+
+							//não starta nova activity pq ele pode criar n tabelas,
+							//e depois acessar a que deseja para prosseguir
+						}else{
+							Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
+						}
 					}
 				}
 			}
 		});
-		
+
 		//clique para ir para a tela de listagem de colunas da tabela
 		listTables.setOnItemClickListener(new OnItemClickListener() {
 
@@ -99,10 +118,10 @@ public class NewTableActivity extends Activity {
 				i.putExtra("DBName", nomeDB);
 				i.putExtra("listaAlteracao", listaAlteracao);
 				startActivity(i);
-				
+
 			}
 		});
-		
+
 		//clique para aparecer a opção de editar a tabela
 		listTables.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -113,9 +132,9 @@ public class NewTableActivity extends Activity {
 				return false;
 			}
 		});
-		
+
 		btnBack.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), NewDatabaseActivity.class);
@@ -143,19 +162,19 @@ public class NewTableActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Edit");
 		menu.add("Delete");
-		
+
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
 		super.onContextItemSelected(item);
-		
+
 		if(item.getTitle().equals("Edit")){
 			//escolha de edição no menu de tabelas
 			// get prompts.xml view
@@ -173,23 +192,23 @@ public class NewTableActivity extends Activity {
 
 			// set dialog message
 			alertDialogBuilder
-				.setCancelable(false)
-				.setPositiveButton("OK",
-				  new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog,int id) {
+			.setCancelable(false)
+			.setPositiveButton("OK",
+					new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
 					// get user input and set it to result
 					// edit text
-				    listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null, null, null, null));
+					listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null, null, null, null, null, null));
 					database.updateTabela(nomeTabelaAAlterar, userInput.getText().toString(), nomeDB);
 					database.updateReferenciaColunaTabela(userInput.getText().toString(), nomeTabelaAAlterar);
-				    }
-				  })
-				.setNegativeButton("Cancel",
-				  new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog,int id) {
+				}
+			})
+			.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
 					dialog.cancel();
-				    }
-				  });
+				}
+			});
 
 			// create alert dialog
 			AlertDialog alertDialog = alertDialogBuilder.create();
@@ -198,26 +217,26 @@ public class NewTableActivity extends Activity {
 			alertDialog.show();
 		}else{
 			//escolha de delete no menu de tabelas
-			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null));
+			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null, null, null));
 			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
 		}
-		
+
 		return true;
 	}
-	
+
 	public void iniciarComponentes(){
-		
+
 		database = new DBHelper(getBaseContext());
-		
+
 		edtNewTableName = (EditText) findViewById(R.id.edtNewTableName);
 		btnNewTable = (Button) findViewById(R.id.btnNewTable);
 		listTables = (ListView) findViewById(R.id.listTables);
 		btnBack = (Button) findViewById(R.id.btnBack);
-		
+
 		//seta o nome do DB atual
 		txtDBName = (TextView) findViewById(R.id.txtDBName);
 		txtDBName.setText("Database: " + nomeDB);
-		
+
 		//preencher namesTables com as tabelas vindas do sistema (que o usuário já inseriu previamente)
 		namesTables = new ArrayList<String>();
 		ArrayList<Tabela> tabelas = new ArrayList<Tabela>();
@@ -225,29 +244,31 @@ public class NewTableActivity extends Activity {
 		for (int i = 0; i < tabelas.size(); i++) {
 			namesTables.add(tabelas.get(i).getNome());
 		}
-		
+
 		adapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_list_item_1, namesTables){
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View view = super.getView(position, convertView, parent);
-		        TextView text = (TextView) view.findViewById(android.R.id.text1);
-		        text.setTextColor(Color.WHITE);
-		        return view;
+				TextView text = (TextView) view.findViewById(android.R.id.text1);
+				text.setTextColor(Color.WHITE);
+				return view;
 			}
 		};
 		listTables.setAdapter(adapter);
-		
+
 		//registrando para no clique longo aparecer menu de contexto
 		registerForContextMenu(listTables);
-		
+
+		flagBancoCriado = database.getFlagCriado(nomeDB);
+
 	}
-	
+
 	public boolean criarTabela(String tabela, String banco){
 		//Método responsável por adicionar as tabelas que o usuário deseja criar 
 		//no banco do sistema
-		
+
 		long result = database.insertTabela(tabela, banco);
-		
+
 		if(result == -1){
 			return false;
 		}else{

@@ -39,20 +39,22 @@ public class PopUpNewColumnActivity extends Activity {
 
 	private String nomeTabela;
 	private ArrayList<String> nomesTabelas;
-	
+
 	//names tables de repasse e alteracoes
 	private ArrayList<String> namesTables;
 	private ArrayList<Alteracao> listaAlteracao;
-	
+
 	private Coluna coluna;
 	private String DBName;
 	private DBHelper database;
+
+	private boolean flagTabelaCriada;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pop_up_new_column);
-		
+
 		Intent i = getIntent();
 		nomeTabela = i.getExtras().getString("nameTable");
 		namesTables = (ArrayList<String>) i.getExtras().get("tablesList");
@@ -61,7 +63,7 @@ public class PopUpNewColumnActivity extends Activity {
 		iniciarComponentes();
 
 		iniciarComponentes();
-		
+
 		spnType.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -69,7 +71,7 @@ public class PopUpNewColumnActivity extends Activity {
 					int position, long id) {
 				if(position != 0){
 					coluna.setTipo((String) parent.getAdapter().getItem(position));
-					
+
 					if(coluna.getTipo().equals("BLOB")){
 						spnTipoBlob.setVisibility(View.VISIBLE);
 					}else{
@@ -84,10 +86,10 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		spnTipoBlob.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -98,13 +100,13 @@ public class PopUpNewColumnActivity extends Activity {
 				}else{
 					coluna.setTipoBlob(null);
 				}
-				
+
 			}
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
 
@@ -130,7 +132,7 @@ public class PopUpNewColumnActivity extends Activity {
 				if(isChecked){
 					spnTableFK.setVisibility(View.VISIBLE);
 					List<Tabela> tabelas = database.getAllNomesTabelas();
-					
+
 					for (int i = 0; i < tabelas.size(); i++) {
 						nomesTabelas.add(tabelas.get(i).getNome());
 					}
@@ -164,13 +166,13 @@ public class PopUpNewColumnActivity extends Activity {
 					for (int i = 0; i < colunas.size(); i++) {
 						nomeColuna.add(colunas.get(i).getNome());
 					}
-					
+
 					ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getBaseContext(),
 							android.R.layout.simple_spinner_item, nomeColuna);
 					dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 					spnColumnFK.setAdapter(dataAdapter);
-					
-					
+
+
 				}else{
 					spnColumnFK.setVisibility(View.GONE);
 					coluna.setNomeTabelaFK(null);
@@ -179,10 +181,10 @@ public class PopUpNewColumnActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
-				
+
 			}
 		});
-		
+
 		spnColumnFK.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -197,7 +199,7 @@ public class PopUpNewColumnActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
-				
+
 			}
 		});
 
@@ -221,15 +223,18 @@ public class PopUpNewColumnActivity extends Activity {
 				if(!edtNomeColuna.getText().toString().equals("")){
 					coluna.setNome(edtNomeColuna.getText().toString());
 					coluna.setAutoincrement(chkAutoincrement.isChecked());
-					
+					coluna.setNomeTabela(nomeTabela);
+
 					boolean criou = false;
 					if(coluna.getTipo() != null){
+						listaAlteracao.add(new Alteracao("addColuna", null, null, null, null, null, null, null, null, null, null, coluna));
+
 						criou = criarColuna(coluna);
 					}else{
 						//ver pq n ta rolando
 						Toast.makeText(getBaseContext(), "Select the column type", Toast.LENGTH_SHORT);
 					}
-					
+
 					if(criou){
 						Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
 						i.putExtra("nameTable", nomeTabela);
@@ -240,6 +245,8 @@ public class PopUpNewColumnActivity extends Activity {
 					}else{
 						Toast.makeText(getBaseContext(), "It's not possible to create the column", Toast.LENGTH_SHORT);
 					}
+
+
 				}else{
 					Toast.makeText(getBaseContext(), "Enter a column name", Toast.LENGTH_SHORT).show();
 				}
@@ -302,38 +309,48 @@ public class PopUpNewColumnActivity extends Activity {
 				android.R.layout.simple_spinner_item, listTBlob);
 		dataAdapterTBlob.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spnTipoBlob.setAdapter(dataAdapterTBlob);
-		
-		
+
+
 		chkPK = (CheckBox) findViewById(R.id.chkPK);
 		chkFK = (CheckBox) findViewById(R.id.chkFK);
 		chkAutoincrement = (CheckBox) findViewById(R.id.chkAutoI);
 
 		btnBackToColumns = (Button) findViewById(R.id.btnBackToColumns);
 		btnOkNewColumn = (Button) findViewById(R.id.btnOkNewColumn);
-		
+
 		nomesTabelas = new ArrayList<String>();
 		nomesTabelas.add("Select a table");
+
+		//para saber se a tabela dessa coluna já foi criada ou não
+		flagTabelaCriada = true;
+		for (int i = 0; i < listaAlteracao.size(); i++) {
+			if(listaAlteracao.get(i).getTipoAlteracao().equals("addTabela")){
+				if(listaAlteracao.get(i).getCreateTabela().getNome().equals(nomeTabela)){
+					flagTabelaCriada = false; //quer dizer que está na lista de alteração e não foi criada
+				}
+			}
+		}
 	}
-	
+
 	public boolean criarColuna(Coluna coluna){
 		int pk = 0;
 		int autoincrement = 0;
 		int fk = 0;
-		
+
 		if(coluna.isPK()){
 			pk = 1;
 		}
-		
+
 		if(coluna.isAutoincrement()){
 			autoincrement = 1;
 		}
-		
+
 		if(coluna.isFK()){
 			fk = 1;
 		}
-		
+
 		long retorno = database.insertColuna(coluna.getNome(), coluna.getTipo(), nomeTabela, pk, autoincrement, fk, coluna.getNomeTabelaFK(), coluna.getNomeColunaFK(), coluna.getTipoBlob());
-		
+
 		if(retorno == -1){
 			return false;
 		}else{

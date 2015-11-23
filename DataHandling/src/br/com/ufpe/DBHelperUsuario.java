@@ -52,7 +52,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 		for (int i = 0; i < tabelas.size(); i++) {
 			createTable = "";
-			createTable = "create table " + tabelas.get(i).getNome() + " (";
+			createTable = "create table if not exists " + tabelas.get(i).getNome() + " (";
 
 			//for para adicionar as colunas na string
 			for (int j = 0; j < colunas.size(); j++) {
@@ -154,6 +154,25 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 				database.execSQL("alter table " +aux.getNomeVelhoTabela() + "rename to " + aux.getNomeNovoTabela());
 			}else if(aux.getTipoAlteracao().equals("delTabela")){
 				database.execSQL("DROP TABLE IF EXISTS " + aux.getDelTabela());
+			}else if(aux.getTipoAlteracao().equals("addTabela")){
+				//para adicionar as tabelas tem que ter as colunas, então se o comando addTabela for encontrado, as tabelas do addColuna são buscadas
+				//pega a tabela e do banco dela e coloca nessa lista
+				ArrayList<Tabela> auxTabelas = new ArrayList<Tabela>();
+				auxTabelas.add(aux.getCreateTabela());
+				
+				ArrayList<Coluna> auxColunas = new ArrayList<Coluna>();
+				
+				//busca as colunas da criação dessa tabela especifica, que também estarão na alteração
+				for (int j = 0; j < listAlteracao.size(); j++) {
+					if(listAlteracao.get(j).getTipoAlteracao().equals("addColuna")){
+						if(listAlteracao.get(j).getCreateColuna().getNomeTabela().equals(aux.getCreateTabela().getNome())){
+							auxColunas.add(listAlteracao.get(j).getCreateColuna());
+						}
+					}
+				}
+				
+				criarTabela(auxColunas, auxTabelas);
+				
 			}else if(aux.getTipoAlteracao().equals("altNomeColuna")){
 				//pega o nome da coluna que vai ser alterada
 				String nomeColunaEdit = aux.getNomeVelhoColuna();
@@ -205,8 +224,6 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 				criarTabela(auxColunas, auxTabelas);
 				
 				//passar os dados da tabela velha pra a aux
-				//DANDO ERRO COM DOIS EDIT: COMO ELE TÁ PEGANDO A PARTE CADA LISTA DE COLUNAS, APENAS COM A SUA ALTERADA,
-				//NAO TA ENXERGANDO EDIÇÕES ANTERIORES, PROVAVELMENTE NEM DELETES. ARRUMAR ISSO E PGAR UMA LISTA DE COLUNAS MAIS ATUALIZADA POSSIVEL
 				database.execSQL("INSERT INTO auxEditColumn(" + stringColunasNovas + ") SELECT "
 			            + stringColunasVelhas + " FROM " + tabelaAtual + ";");
 				
@@ -220,6 +237,31 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 				
 				//renomear nova tabela para nome antigo
 				database.execSQL("alter table auxEditColumn rename to " + tabelaAtual);
+				
+			}else if(aux.getTipoAlteracao().equals("addColuna")){
+				//verifica se só tem addColuna na lista de alteração. Se sim, é uma inserção de nova tabela e isso não deve ser feito
+				boolean insercaoNovaTabela = false; // inserção de nova tabela com banco ainda não criado. Se ele permanecer falso, quer dizer que um addcoluna n deve ser feito pq o banco ainda n foi criado, entao é outro caso
+				for (int j = 0; j < listAlteracao.size(); j++) {
+					if(!listAlteracao.get(j).getTipoAlteracao().equals("addColuna")){
+						insercaoNovaTabela = true;
+					}
+				}
+				
+				//aqui só serão tratados os casos de adição de coluna a uma tabela já existente
+				//verifica se a tabela dessa coluna não está na lista de alterações, porque se não tiver quer dizer que é uma tabela já criada
+				boolean tabelaJaCriada = true;
+				for (int j = 0; j < listAlteracao.size(); j++) {
+					if(listAlteracao.get(j).getTipoAlteracao().equals("addTabela")){
+						if(listAlteracao.get(j).getCreateTabela().getNome().equals(aux.getCreateColuna().getNomeTabela())){
+							tabelaJaCriada = false;
+						}
+					}
+				}
+				
+				//se a tabela ja ta criada, só adiciona a coluna
+				if(tabelaJaCriada || !insercaoNovaTabela){
+					database.execSQL("alter table " + aux.getCreateColuna().getNomeTabela() + " add column " + aux.getCreateColuna().getNome() + " " + aux.getCreateColuna().getTipo());
+				}
 				
 			}else{
 				//delColuna
@@ -373,7 +415,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 		for (int i = 0; i < tabelas.size(); i++) {
 			createTable = "";
-			createTable = "create table " + tabelas.get(i).getNome() + " (";
+			createTable = "create table if not exists " + tabelas.get(i).getNome() + " (";
 
 			//for para adicionar as colunas na string
 			for (int j = 0; j < colunas.size(); j++) {

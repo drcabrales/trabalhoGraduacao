@@ -242,6 +242,7 @@ public class DataViewActivity extends Activity {
 				i.putExtra("ListaColunas", colunasParaVisualizacao);
 				i.putExtra("tablesList", namesTables);
 				i.putExtra("ListaTabelas", tabelas);
+				i.putExtra("listaAlteracao", listaAlteracao);
 				startActivity(i);
 			}
 		});
@@ -293,8 +294,50 @@ public class DataViewActivity extends Activity {
 			tabelas.add(new Tabela(namesTables.get(i), DBName));
 		}
 
-		//para criar o DB, tem que usar todas as tabelas e colunas
-		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelas, colunas);
+		//TEM QUE VERIFICAR SE AS TABELAS E COLUNAS QUE ESTAO SENDO PASSADAS AQUI NÃO SAO AS DE ALTERAÇÃO!
+		ArrayList<Tabela> tabelasSemAlt = new ArrayList<Tabela>();
+		for (int i = 0; i < tabelas.size(); i++) {
+			Tabela aux = new Tabela(tabelas.get(i).getNome(), tabelas.get(i).getNomeBanco());
+			tabelasSemAlt.add(aux);
+		}
+		
+		ArrayList<Coluna> colunasSemAlt = new ArrayList<Coluna>();
+		for (int i = 0; i < colunas.size(); i++) {
+			Coluna aux = new Coluna();
+			aux.setAutoincrement(colunas.get(i).isAutoincrement());
+			aux.setFK(colunas.get(i).isFK());
+			aux.setNome(colunas.get(i).getNome());
+			aux.setNomeColunaFK(colunas.get(i).getNomeColunaFK());
+			aux.setNomeTabela(colunas.get(i).getNomeTabela());
+			aux.setNomeTabelaFK(colunas.get(i).getNomeTabelaFK());
+			aux.setPK(colunas.get(i).isPK());
+			aux.setTipo(colunas.get(i).getTipo());
+			aux.setTipoBlob(colunas.get(i).getTipoBlob());
+			colunasSemAlt.add(aux);
+		}
+		
+		for (int i = 0; i < listaAlteracao.size(); i++) {
+			if(listaAlteracao.get(i).getTipoAlteracao().equals("addTabela")){
+				for (int j = 0; j < tabelasSemAlt.size(); j++) {
+					if(tabelasSemAlt.get(j).getNome().equals(listaAlteracao.get(i).getCreateTabela().getNome())){
+						tabelasSemAlt.remove(j);
+					}
+				}
+			}
+			
+			if(listaAlteracao.get(i).getTipoAlteracao().equals("addColuna")){
+				for (int j = 0; j < colunasSemAlt.size(); j++) {
+					if(colunasSemAlt.get(j).getNome().equals(listaAlteracao.get(i).getCreateColuna().getNome())){
+						colunasSemAlt.remove(j);
+					}
+				}
+			}
+		}
+		//================================================================================================
+		
+		//para criar o DB, tem que usar todas as tabelas e colunas (que não são da alteração)
+		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelasSemAlt, colunasSemAlt);
+		database.setFlagCriado(1, DBName);
 		
 		//depois que cria o banco de dados padrao, verifica se tem alterações
 		

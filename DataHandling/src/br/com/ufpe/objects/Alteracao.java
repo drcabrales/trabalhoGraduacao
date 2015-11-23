@@ -13,8 +13,10 @@ public class Alteracao implements Serializable{
 	/*tipoAlteracao pode ser:
 	- altNomeTabela
 	- delTabela
+	- addTabela
 	- altNomeColuna
 	- delColuna
+	- addColuna
 	*/
 	
 	private String nomeVelhoTabela;
@@ -22,6 +24,9 @@ public class Alteracao implements Serializable{
 	
 	private String nomeVelhoColuna;
 	private String nomeNovoColuna;
+	
+	private Tabela createTabela;
+	private Coluna createColuna;
 	
 	private String delTabela;
 	private String delColuna;
@@ -110,7 +115,23 @@ public class Alteracao implements Serializable{
 		DBName = dBName;
 	}
 
-	public Alteracao(String tipoAlteracao, String nomeVelhoTabela, String nomeNovoTabela, String nomeVelhoColuna, String nomeNovoColuna, String delTabela, String delColuna, ArrayList<String> tabelas, ArrayList<Coluna> colunas, String DBName){
+	public Tabela getCreateTabela() {
+		return createTabela;
+	}
+
+	public void setCreateTabela(Tabela createTabela) {
+		this.createTabela = createTabela;
+	}
+
+	public Coluna getCreateColuna() {
+		return createColuna;
+	}
+
+	public void setCreateColuna(Coluna createColuna) {
+		this.createColuna = createColuna;
+	}
+
+	public Alteracao(String tipoAlteracao, String nomeVelhoTabela, String nomeNovoTabela, String nomeVelhoColuna, String nomeNovoColuna, String delTabela, String delColuna, ArrayList<String> tabelas, ArrayList<Coluna> colunas, String DBName, Tabela createTabela, Coluna createColuna){
 		this.delColuna = delColuna;
 		this.delTabela = delTabela;
 		this.nomeNovoColuna = nomeNovoColuna;
@@ -121,5 +142,7 @@ public class Alteracao implements Serializable{
 		this.colunas = colunas;
 		this.tabelas = tabelas;
 		this.DBName = DBName;
+		this.createColuna = createColuna;
+		this.createTabela = createTabela;
 	}
 }

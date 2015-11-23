@@ -230,7 +230,7 @@ public class NewColumnActivity extends Activity {
 				    public void onClick(DialogInterface dialog,int id) {
 					// get user input and set it to result
 					// edit text
-				    listaAlteracao.add(new Alteracao("altNomeColuna", null, null, nomeColunaAAlterar, userInput.getText().toString(), null, null, namesTables, colunasAlt, DBName));
+				    listaAlteracao.add(new Alteracao("altNomeColuna", null, null, nomeColunaAAlterar, userInput.getText().toString(), null, null, namesTables, colunasAlt, DBName, null, null));
 				    
 				    for (int i = 0; i < colunasAlt.size(); i++) {
 						if(colunasAlt.get(i).getNome().equals(nomeColunaAAlterar)){
@@ -258,7 +258,7 @@ public class NewColumnActivity extends Activity {
 			alertDialog.show();
 		}else{
 			//escolha de delete no menu de tabelas
-			listaAlteracao.add(new Alteracao("delColuna", null, null, null, null, null, nomeColunaAAlterar, namesTables, colunasAlt, DBName));
+			listaAlteracao.add(new Alteracao("delColuna", null, null, null, null, null, nomeColunaAAlterar, namesTables, colunasAlt, DBName, null, null));
 			
 			for (int i = 0; i < colunasAlt.size(); i++) {
 				if(colunasAlt.get(i).getNome().equals(nomeColunaAAlterar)){

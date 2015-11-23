@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper{
      private SQLiteDatabase database;
      
      private static final String DATABASE_CREATE_BANCO =
-             "create table "+ TABLE1_NAME +" (nome text not null, PRIMARY KEY (nome));";
+             "create table "+ TABLE1_NAME +" (nome text not null, flagCriado integer, PRIMARY KEY (nome));";
      
      private static final String DATABASE_CREATE_TABELA =
              "create table "+ TABLE2_NAME +" (nome text not null, nomeBanco text not null, PRIMARY KEY (nome), FOREIGN KEY(nomeBanco) REFERENCES "+TABLE1_NAME+" (nome));";
@@ -58,6 +58,7 @@ public class DBHelper extends SQLiteOpenHelper{
 		database = this.getWritableDatabase();
 		ContentValues initialValues = new ContentValues();
         initialValues.put("nome", nomeBanco);
+        initialValues.put("flagCriado", 0);
         return database.insert(TABLE1_NAME, null, initialValues);
 	}
 	
@@ -93,12 +94,12 @@ public class DBHelper extends SQLiteOpenHelper{
 	
 	public List<Banco> getAllNomesBancos() {
         database = this.getReadableDatabase();
-        Cursor cursor = database.query(TABLE1_NAME, new String[] { "nome" }, null, null, null, null, null);
+        Cursor cursor = database.query(TABLE1_NAME, new String[] { "nome", "flagCriado" }, null, null, null, null, null);
 
         List<Banco> retorno = new ArrayList<Banco>();
 
         while(cursor.moveToNext()){
-        	Banco banco = new Banco(cursor.getString(cursor.getColumnIndex("nome")));
+        	Banco banco = new Banco(cursor.getString(cursor.getColumnIndex("nome")), cursor.getInt(cursor.getColumnIndex("flagCriado")));
             retorno.add(banco);
         }
 
@@ -237,6 +238,27 @@ public class DBHelper extends SQLiteOpenHelper{
         database = this.getWritableDatabase();
         database.execSQL("delete from Coluna where nome = '" + coluna + "' and nomeTabela = '"+ nomeTabela +"';");
     }
+	
+	public void setFlagCriado(int flagCriado, String DBName){
+		 database = this.getWritableDatabase();
+		 database.execSQL("update Banco set flagCriado = " + flagCriado + " where nome = '" + DBName + "'");
+	}
+	
+	public boolean getFlagCriado(String DBName){
+		database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery("select flagCriado from Banco where nome = '" + DBName + "'", null);
+
+        int flagRetorno = -1;
+        while(cursor.moveToNext()){
+        	flagRetorno = cursor.getInt(cursor.getColumnIndex("flagCriado"));
+        }
+
+        if(flagRetorno == 1){
+        	return true;
+        }else{
+        	return false;
+        }
+	}
 	
 	//método responsável por criar os bancos de dados do usuário
 	public DBHelperUsuario createUserDatabase(Context context, String nomeBanco, ArrayList<Tabela> tabelas, ArrayList<Coluna> colunas){
