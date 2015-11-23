@@ -227,6 +227,11 @@ public class DBHelper extends SQLiteOpenHelper{
         database.execSQL("delete from Tabela where nome = '" + tabela + "' and nomeBanco = '"+ DBName +"';");
     }
 	
+	public void deleteReferenciaColunaTabela(String nomeVelhaTabela){ //quando deletar a tabela, deleta as colunas que tem essa referencias
+		 database = this.getWritableDatabase();
+	     database.execSQL("delete from Coluna where nomeTabela = '" + nomeVelhaTabela +"';");
+	}
+	
 	public boolean updateColuna(String colunaAAlterar, String coluna, String nomeTabela) {
         database = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();

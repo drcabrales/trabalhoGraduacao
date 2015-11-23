@@ -218,6 +218,7 @@ public class NewTableActivity extends Activity {
 		}else{
 			//escolha de delete no menu de tabelas
 			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null, null, null));
+			database.deleteReferenciaColunaTabela(nomeTabelaAAlterar);
 			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
 		}
 
