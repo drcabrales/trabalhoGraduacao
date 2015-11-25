@@ -56,12 +56,12 @@ public class DataViewActivity extends Activity {
 	private DBHelperUsuario dbHelperUsuario;
 
 	private Button btnNovoDado;
-	
+
 	private Map<Integer, String> auxDadosBlob;
-	
+
 	//alteracao de esquema
 	private ArrayList<Alteracao> listaAlteracao;
-	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -138,12 +138,12 @@ public class DataViewActivity extends Activity {
 					//coloca a indicação do blob na tabela
 					//por enquanto fica o path, pra ver se deu certo
 					String hashmapkey = colunasParaVisualizacao.get(k).getNome() + j+ k;
-					
+
 					final String path = (String) dados.get(hashmapkey) + "";
-					
+
 					//salvando o path para a coluna correta
 					auxDadosBlob.put(Integer.parseInt(j+""+k), path);
-					
+
 					if(path.substring(path.length()-3, path.length()).equals("png") || path.substring(path.length()-3, path.length()).equals("jpg") || path.substring(path.length()-4, path.length()).equals("jpeg")){ //imagem
 						final Button btnVerBlob = new Button(this);
 						btnVerBlob.setText("IMG");
@@ -168,14 +168,14 @@ public class DataViewActivity extends Activity {
 
 							}
 						});
-						
+
 						linha.addView(btnVerBlob);
 
 					}else if(path.substring(path.length()-3, path.length()).equals("mp3") || path.substring(path.length()-3, path.length()).equals("ogg") || path.substring(path.length()-3, path.length()).equals("aac")){ //musica
 						final Button btnVerBlob = new Button(this);
 						btnVerBlob.setText("MUS");
 						btnVerBlob.setId(Integer.parseInt(j + "" + k));
-						
+
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
 							@Override
@@ -186,7 +186,7 @@ public class DataViewActivity extends Activity {
 
 							}
 						});
-						
+
 						linha.addView(btnVerBlob);
 
 					}else{ //video
@@ -208,7 +208,7 @@ public class DataViewActivity extends Activity {
 
 							}
 						});
-						
+
 						linha.addView(btnVerBlob);
 					}
 
@@ -285,7 +285,7 @@ public class DataViewActivity extends Activity {
 		//preenchendo as colunas da visualização
 		Intent intent = getIntent();
 		colunas = (ArrayList<Coluna>) intent.getExtras().get("columnsList");
-		
+
 		//colunas especificas da tabela clicada
 		colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
 
@@ -300,7 +300,7 @@ public class DataViewActivity extends Activity {
 			Tabela aux = new Tabela(tabelas.get(i).getNome(), tabelas.get(i).getNomeBanco());
 			tabelasSemAlt.add(aux);
 		}
-		
+
 		ArrayList<Coluna> colunasSemAlt = new ArrayList<Coluna>();
 		for (int i = 0; i < colunas.size(); i++) {
 			Coluna aux = new Coluna();
@@ -315,7 +315,7 @@ public class DataViewActivity extends Activity {
 			aux.setTipoBlob(colunas.get(i).getTipoBlob());
 			colunasSemAlt.add(aux);
 		}
-		
+
 		for (int i = 0; i < listaAlteracao.size(); i++) {
 			if(listaAlteracao.get(i).getTipoAlteracao().equals("addTabela")){
 				for (int j = 0; j < tabelasSemAlt.size(); j++) {
@@ -324,45 +324,50 @@ public class DataViewActivity extends Activity {
 					}
 				}
 			}
-			
-			if(listaAlteracao.get(i).getTipoAlteracao().equals("addColuna")){
-				for (int j = 0; j < colunasSemAlt.size(); j++) {
-					if(colunasSemAlt.get(j).getNome().equals(listaAlteracao.get(i).getCreateColuna().getNome())){
-						colunasSemAlt.remove(j);
+
+			if(database.getFlagCriado(DBName)){ //se o banco ainda n foi criado, quer dizer que as colunas que estão em alteração são colunas que estão sendo executadas pela primeira vez, e não devem sair da lista de colunas
+				if(listaAlteracao.get(i).getTipoAlteracao().equals("addColuna")){
+					for (int j = 0; j < colunasSemAlt.size(); j++) {
+						if(colunasSemAlt.get(j).getNome().equals(listaAlteracao.get(i).getCreateColuna().getNome())){
+							colunasSemAlt.remove(j);
+						}
 					}
 				}
 			}
 		}
 		//================================================================================================
-		
+
 		//para criar o DB, tem que usar todas as tabelas e colunas (que não são da alteração)
 		dbHelperUsuario = new DBHelperUsuario(getBaseContext(), DBName, tabelasSemAlt, colunasSemAlt);
-		database.setFlagCriado(1, DBName);
-		
+
 		//depois que cria o banco de dados padrao, verifica se tem alterações
-		
+
 		//ve se a lista de alteracoes ta vazia
-		if(listaAlteracao != null){
-			if(listaAlteracao.size() > 0){
-				//tem alteração, então atualiza
-				dbHelperUsuario.onUpdateSchema(listaAlteracao);
-				
-				//pegar "tabelas" e "colunas" novas para os atributos correspondentes, alem de mudar namestables
-				tabelas = (ArrayList<Tabela>) database.getAllNomesTabelas();
-				namesTables = new ArrayList<String>();
-				for (int i = 0; i < tabelas.size(); i++) {
-					namesTables.add(tabelas.get(i).getNome());
+		//só faz alteraçao caso o banco ja tenha sido criado
+		if(database.getFlagCriado(DBName)){
+			if(listaAlteracao != null){
+				if(listaAlteracao.size() > 0){
+					//tem alteração, então atualiza
+					dbHelperUsuario.onUpdateSchema(listaAlteracao);
+
+					//pegar "tabelas" e "colunas" novas para os atributos correspondentes, alem de mudar namestables
+					tabelas = (ArrayList<Tabela>) database.getAllNomesTabelas();
+					namesTables = new ArrayList<String>();
+					for (int i = 0; i < tabelas.size(); i++) {
+						namesTables.add(tabelas.get(i).getNome());
+					}
+					colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
+
 				}
-				colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
-				
 			}
 		}
-		
+
+		database.setFlagCriado(1, DBName);
 		auxDadosBlob = new HashMap<Integer, String>();
 
 
 	}
-	
+
 	private void play(Context context, Uri uri) {
 
 		try {
