@@ -22,5 +22,6 @@
     <string name="title_activity_pop_up_new_column">PopUpNewColumnActivity</string>
     <string name="title_activity_data_view">DataViewActivity</string>
     <string name="title_activity_new_data">NewDataActivity</string>
+    <string name="title_activity_edit_data">EditDataActivity</string>
 
 </resources>

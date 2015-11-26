@@ -2,6 +2,7 @@ package br.com.ufpe;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +63,9 @@ public class DataViewActivity extends Activity {
 	//alteracao de esquema
 	private ArrayList<Alteracao> listaAlteracao;
 
+	//alteração de dados
+	private ArrayList<TableRow> linhasDeDados;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,8 @@ public class DataViewActivity extends Activity {
 
 		for (int j = 0; j < (dados.size()/colunasParaVisualizacao.size()); j++) { //quantidade de linhas (dados totais / colunas)
 			TableRow linha = new TableRow(this);
+			linha.setId(j);
+			linhasDeDados.add(linha);
 
 			for (int k = 0; k < colunasParaVisualizacao.size(); k++) { //quantidade colunas
 				TextView dadoColuna = new TextView(this);
@@ -248,6 +254,83 @@ public class DataViewActivity extends Activity {
 		});
 
 
+		//CLIQUE PARA EDIÇÃO DE LINHAS
+		for (int j = 0; j < linhasDeDados.size(); j++) {
+			TableRow row = linhasDeDados.get(j);
+
+			//ATENÇÃO: MUDAR PARA LONGCLICK COM A ESCOLHA DE EDITAR OU DELETAR!
+			row.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Intent i = new Intent(getBaseContext(), EditDataActivity.class);
+					
+					//passa os dados da linha para a EditDataActivity, através de um hashmap("nomeDaColuna", valor)
+					HashMap<String, Object> dataRow = new HashMap<String, Object>();
+					for (int l = 0; l < colunasParaVisualizacao.size(); l++) {
+						TableRow aux = (TableRow) v;
+						
+						if(!colunasParaVisualizacao.get(l).getTipo().equals("BLOB")){
+							if(colunasParaVisualizacao.get(l).getTipo().equals("Varchar") || colunasParaVisualizacao.get(l).getTipo().equals("Text")){
+								
+								dataRow.put(colunasParaVisualizacao.get(l).getNome(), ((TextView) aux.getChildAt(l)).getText().toString());
+								
+							}else if(colunasParaVisualizacao.get(l).getTipo().equals("Integer")){
+								
+								dataRow.put(colunasParaVisualizacao.get(l).getNome(), Integer.parseInt(((TextView) aux.getChildAt(l)).getText().toString()));
+								
+							}else if(colunasParaVisualizacao.get(l).getTipo().equals("Double")){
+								
+								dataRow.put(colunasParaVisualizacao.get(l).getNome(), Double.parseDouble(((TextView) aux.getChildAt(l)).getText().toString()));
+								
+							}else if(colunasParaVisualizacao.get(l).getTipo().equals("Float")){
+								
+								dataRow.put(colunasParaVisualizacao.get(l).getNome(), Float.parseFloat(((TextView) aux.getChildAt(l)).getText().toString()));
+								
+							}else if(colunasParaVisualizacao.get(l).getTipo().equals("Datetime")){
+								
+								SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+								try {
+									dataRow.put(colunasParaVisualizacao.get(l).getNome(), format.parse(((TextView) aux.getChildAt(l)).getText().toString()));
+								} catch (ParseException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+							}else{
+								//boolean
+								//esse é passado como string mesmo porque na edição do dado ele é vindo de um spinner
+								dataRow.put(colunasParaVisualizacao.get(l).getNome(), ((TextView) aux.getChildAt(l)).getText().toString());
+								
+							}
+
+						}else{ //blob
+							
+							String recoveryKey = aux.getId() + "" + l; //para pegar da mesma forma que pega a URI no botão, chave feita por numLinha e numColuna
+							dataRow.put(colunasParaVisualizacao.get(l).getNome(), auxDadosBlob.get(Integer.parseInt(recoveryKey)));
+							
+						}
+					}
+					
+					//passa a hashmap de dados e a lista de colunas de visualização para a EditDataActivity
+					i.putExtra("ListaColunas", colunasParaVisualizacao);
+					i.putExtra("Linha", dataRow);
+					
+					
+					//também passa essas coisas para não dar erro na volta
+					i.putExtra("DBName", DBName);
+					i.putExtra("TableName", nameTabela);
+					i.putExtra("tablesList", namesTables);
+					i.putExtra("ListaTabelas", tabelas);
+					i.putExtra("listaAlteracao", listaAlteracao);
+					
+					//starta a activity
+					startActivity(i);
+				}
+			});
+		}
+
+
 
 	}
 
@@ -281,6 +364,7 @@ public class DataViewActivity extends Activity {
 		tableName.setText("Table: " + nameTabela);
 
 		btnNovoDado = (Button) findViewById(R.id.btnNewData);
+		linhasDeDados = new ArrayList<TableRow>();
 
 		//preenchendo as colunas da visualização
 		Intent intent = getIntent();

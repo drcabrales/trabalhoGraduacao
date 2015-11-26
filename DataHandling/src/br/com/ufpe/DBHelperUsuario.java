@@ -138,18 +138,18 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 		}
 		onCreate(db); 
 	}
-	
+
 	public void onUpdateSchema(ArrayList<Alteracao> listAlteracao){
 		//pega o database
 		database = getWritableDatabase();
 		//por segurança, deleta a tabela auxiliar se existir
 		database.execSQL("DROP TABLE IF EXISTS auxEditColumn");
-		
+
 		//ve o tipo da alteracao
 		//para cada tipo, monta um execSQL diferente, com alter
 		for (int i = 0; i < listAlteracao.size(); i++) {
 			Alteracao aux = listAlteracao.get(i);
-			
+
 			if(aux.getTipoAlteracao().equals("altNomeTabela")){
 				database.execSQL("alter table " +aux.getNomeVelhoTabela() + "rename to " + aux.getNomeNovoTabela());
 			}else if(aux.getTipoAlteracao().equals("delTabela")){
@@ -159,9 +159,9 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 				//pega a tabela e do banco dela e coloca nessa lista
 				ArrayList<Tabela> auxTabelas = new ArrayList<Tabela>();
 				auxTabelas.add(aux.getCreateTabela());
-				
+
 				ArrayList<Coluna> auxColunas = new ArrayList<Coluna>();
-				
+
 				//busca as colunas da criação dessa tabela especifica, que também estarão na alteração
 				for (int j = 0; j < listAlteracao.size(); j++) {
 					if(listAlteracao.get(j).getTipoAlteracao().equals("addColuna")){
@@ -170,35 +170,35 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 						}
 					}
 				}
-				
+
 				criarTabela(auxColunas, auxTabelas);
-				
+
 			}else if(aux.getTipoAlteracao().equals("altNomeColuna")){
 				//pega o nome da coluna que vai ser alterada
 				String nomeColunaEdit = aux.getNomeVelhoColuna();
-				
+
 				//pega a lista de colunas
 				ArrayList<Coluna> auxColunas = aux.getColunas();
-				
+
 				//pega o nome do banco de dados
 				String auxBanco = aux.getDBName();
-				
+
 				//pega o nome da tabela e do banco da coluna e coloca nessa lista como objeto tabela
 				ArrayList<Tabela> auxTabelas = new ArrayList<Tabela>();
 				Tabela newTable = new Tabela("auxEditColumn", auxBanco);
 				auxTabelas.add(newTable);
-				
+
 				//pega o nome da tabela atual da coluna a ser editada
 				String tabelaAtual = "";
-				
+
 				//pega todas os nomes de colunas, separadas por virgula, em unica string
 				String stringColunasVelhas = "";
 				String stringColunasNovas = "";
-				
+
 				//muda a coluna que quer ser editada para ter o novo nome e nova tabela
 				for (int j = 0; j < auxColunas.size(); j++) {
 					tabelaAtual = auxColunas.get(j).getNomeTabela();
-					
+
 					if(j+1 >= auxColunas.size()){ //sem virgula
 						if(auxColunas.get(j).getNome().equals(aux.getNomeNovoColuna())){ //se o atual da lista e o que sabemos que vamos editar baterem, salvamos eles com o formato novo e velho nas strings
 							stringColunasVelhas = stringColunasVelhas + aux.getNomeVelhoColuna();
@@ -216,17 +216,17 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 							stringColunasNovas = stringColunasNovas + auxColunas.get(j).getNome() + ",";
 						}
 					}
-					
+
 					auxColunas.get(j).setNomeTabela("auxEditColumn");
 				}
-				
+
 				//cria uma tabela auxiliar e passa os dados da primeira tabela pra segunda
 				criarTabela(auxColunas, auxTabelas);
-				
+
 				//passar os dados da tabela velha pra a aux
 				database.execSQL("INSERT INTO auxEditColumn(" + stringColunasNovas + ") SELECT "
-			            + stringColunasVelhas + " FROM " + tabelaAtual + ";");
-				
+						+ stringColunasVelhas + " FROM " + tabelaAtual + ";");
+
 				//deleta a primeira tabela (verificar se deu erro ou n por foreign key)
 				try{
 					database.execSQL("DROP TABLE IF EXISTS " + tabelaAtual);
@@ -234,10 +234,10 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 					//se entrar aqui, deu erro pra deletar
 					//avisar que a atualização falhou
 				}
-				
+
 				//renomear nova tabela para nome antigo
 				database.execSQL("alter table auxEditColumn rename to " + tabelaAtual);
-				
+
 			}else if(aux.getTipoAlteracao().equals("addColuna")){
 				//verifica se só tem addColuna na lista de alteração. Se sim, é uma inserção de nova tabela e isso não deve ser feito
 				boolean insercaoNovaTabela = false; // inserção de nova tabela com banco ainda não criado. Se ele permanecer falso, quer dizer que um addcoluna n deve ser feito pq o banco ainda n foi criado, entao é outro caso
@@ -246,7 +246,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 						insercaoNovaTabela = true;
 					}
 				}
-				
+
 				//aqui só serão tratados os casos de adição de coluna a uma tabela já existente
 				//verifica se a tabela dessa coluna não está na lista de alterações, porque se não tiver quer dizer que é uma tabela já criada
 				boolean tabelaJaCriada = true;
@@ -257,34 +257,34 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 						}
 					}
 				}
-				
+
 				//se a tabela ja ta criada, só adiciona a coluna
 				if(tabelaJaCriada || !insercaoNovaTabela){
 					database.execSQL("alter table " + aux.getCreateColuna().getNomeTabela() + " add column " + aux.getCreateColuna().getNome() + " " + aux.getCreateColuna().getTipo());
 				}
-				
+
 			}else{
 				//delColuna
 				//pega o nome da coluna que vai ser deletada
 				String nomeColunaDel = aux.getDelColuna();
-				
+
 				//pega a lista de colunas
 				ArrayList<Coluna> auxColunas = aux.getColunas();
-				
+
 				//pega o nome do banco de dados
 				String auxBanco = aux.getDBName();
-				
+
 				//pega o nome da tabela e do banco da coluna e coloca nessa lista como objeto tabela
 				ArrayList<Tabela> auxTabelas = new ArrayList<Tabela>();
 				Tabela newTable = new Tabela("auxEditColumn", auxBanco);
 				auxTabelas.add(newTable);
-				
+
 				//pega o nome da tabela atual da coluna a ser editada
 				String tabelaAtual = "";
-				
+
 				//pega todas os nomes de colunas, separadas por virgula, em unica string
 				String stringColunas = "";
-				
+
 				//muda a coluna que quer ser editada para ter o novo nome e nova tabela
 				for (int j = 0; j < auxColunas.size(); j++) {
 					tabelaAtual = auxColunas.get(j).getNomeTabela();
@@ -300,24 +300,24 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 							stringColunas = stringColunas.substring(0, stringColunas.length()-1);
 						}
 					}
-					
+
 					auxColunas.get(j).setNomeTabela("auxEditColumn");
 				}
-				
+
 				//retirar a coluna que se deseja eliminar em auxColunas
 				for (int j = 0; j < auxColunas.size(); j++) {
 					if(auxColunas.get(j).getNome().equals(aux.getDelColuna())){
 						auxColunas.remove(j);
 					}
 				}
-				
+
 				//cria uma tabela auxiliar e passa os dados da primeira tabela pra segunda
 				criarTabela(auxColunas, auxTabelas);
-				
+
 				//passar os dados da tabela velha pra a aux
 				database.execSQL("INSERT INTO auxEditColumn(" + stringColunas + ") SELECT "
-			            + stringColunas + " FROM " + tabelaAtual + ";");
-				
+						+ stringColunas + " FROM " + tabelaAtual + ";");
+
 				//deleta a primeira tabela (verificar se deu erro ou n por foreign key)
 				try{
 					database.execSQL("DROP TABLE IF EXISTS " + tabelaAtual);
@@ -325,7 +325,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 					//se entrar aqui, deu erro pra deletar
 					//avisar que a atualização falhou
 				}
-				
+
 				//renomear nova tabela para nome antigo
 				database.execSQL("alter table auxEditColumn rename to " + tabelaAtual);
 			}
@@ -365,6 +365,67 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 		return retorno;
 	}
 
+	public void update(ArrayList<Coluna> colunas, ArrayList<Object> dados, String nomeTabela){
+		database = getWritableDatabase();
+		String query = "update " + nomeTabela + " set ";
+
+		//construção da string de update
+		for (int i = 0; i < colunas.size(); i++) {
+			if(!colunas.get(i).isPK()){ //só edita dados que não forem chave primária
+				if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
+					query = query + colunas.get(i).getNome() + " = '" + dados.get(i) + "',";
+				}else if(colunas.get(i).getTipo().equals("Double")){
+					query = query + colunas.get(i).getNome() + " = " + dados.get(i) + ",";
+				}else if(colunas.get(i).getTipo().equals("Float")){
+					query = query + colunas.get(i).getNome() + " = " + dados.get(i) + ",";
+				}else if(colunas.get(i).getTipo().equals("Integer")){
+					query = query + colunas.get(i).getNome() + " = " + dados.get(i) + ",";
+				}else if(colunas.get(i).getTipo().equals("Boolean")){
+					query = query + colunas.get(i).getNome() + " = '" + dados.get(i) + "',";
+				}else if(colunas.get(i).getTipo().equals("Datetime")){
+					SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					//query = query + colunas.get(i).getNome() + " = '" + dateFormat.format(dados.get(i)) + "',";
+					query = query + colunas.get(i).getNome() + " = " + ((Date) dados.get(i)).getTime() + ",";
+				}else{
+					//BLOB
+					query = query + colunas.get(i).getNome() + " = '" + dados.get(i) + "',";
+				}
+			}
+		}
+		
+		//retira a virgula do final e colocando o where
+		query = query.substring(0, query.length()-1) + " where ";
+		
+		int countPK = 0;
+		for (int i = 0; i < colunas.size(); i++) {
+			if(colunas.get(i).isPK()){
+				countPK++;
+			}
+		}
+
+		for (int i = 0; i < colunas.size() && countPK > 0; i++) {
+			if(colunas.get(i).isPK()){
+				if(countPK == 1){
+					if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
+						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + "' ";
+					}else{
+						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + " ";
+					}
+					countPK--;
+				}else{
+					if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
+						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + "' and ";
+					}else{
+						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + " and ";
+					}
+					countPK--;
+				}
+			}
+		}
+
+		database.execSQL(query);
+	}
+
 	public Map<String, Object> getAllDataFromTable(String tablename, ArrayList<Coluna> colunas){
 		Map<String, Object> retorno = new HashMap<String, Object>();
 		database = this.getWritableDatabase();
@@ -400,14 +461,14 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 						//blob
 						retorno.put(hashmapkey, cursor.getString(cursor.getColumnIndex(nomesC[i])));
 					}
-					
+
 				}
 				contadorLinhas++;
 			}while(cursor.moveToNext());
 		}
 		return retorno;
 	}
-	
+
 	public void criarTabela(ArrayList<Coluna> colunas, ArrayList<Tabela> tabelas){
 		ArrayList<String> criacaoTabelas = new ArrayList<String>();
 		String createTable = "";
