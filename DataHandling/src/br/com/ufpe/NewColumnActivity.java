@@ -267,6 +267,7 @@ public class NewColumnActivity extends Activity {
 			}
 			
 			database.deleteColuna(nomeColunaAAlterar, nomeTabela);
+			Toast.makeText(this, "Column deleted!", Toast.LENGTH_SHORT).show();
 		}
 		
 		return true;

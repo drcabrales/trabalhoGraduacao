@@ -425,6 +425,36 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 		database.execSQL(query);
 	}
+	
+	public void deleteRow(ArrayList<Coluna> colunas, ArrayList<Object> dados, String tableName){
+		int countPk = 0;
+		String query = "delete from " +tableName+ " where ";
+		for (int l = 0; l < colunas.size(); l++) {
+			if(colunas.get(l).isPK()){
+				countPk++;
+			}
+		}
+		
+		for (int l = 0; l < colunas.size() && countPk > 0; l++) {
+			if(countPk == 1){
+				if(colunas.get(l).getTipo().equals("Varchar") || colunas.get(l).getTipo().equals("Text")){
+					query = query + colunas.get(l).getNome() + " = '" + dados.get(l) + "';";
+				}else{
+					query = query + colunas.get(l).getNome() + " = " + dados.get(l) + ";";
+				}
+				countPk--;
+			}else{
+				if(colunas.get(l).getTipo().equals("Varchar") || colunas.get(l).getTipo().equals("Text")){
+					query = query + colunas.get(l).getNome() + " = '" + dados.get(l) + "' and ";
+				}else{
+					query = query + colunas.get(l).getNome() + " = " + dados.get(l) + " and ";
+				}
+				countPk--;
+			}
+		}
+		
+		database.execSQL(query);
+	}
 
 	public Map<String, Object> getAllDataFromTable(String tablename, ArrayList<Coluna> colunas){
 		Map<String, Object> retorno = new HashMap<String, Object>();

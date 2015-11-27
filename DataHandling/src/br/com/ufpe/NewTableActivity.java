@@ -220,6 +220,7 @@ public class NewTableActivity extends Activity {
 			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null, null, null));
 			database.deleteReferenciaColunaTabela(nomeTabelaAAlterar);
 			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
+			Toast.makeText(this, "Table deleted!", Toast.LENGTH_SHORT).show();
 		}
 
 		return true;

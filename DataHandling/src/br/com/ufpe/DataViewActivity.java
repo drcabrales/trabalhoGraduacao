@@ -45,6 +45,7 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DataViewActivity extends Activity {
 
@@ -359,6 +360,33 @@ public class DataViewActivity extends Activity {
 			startActivity(i);
 		}else{
 			//escolha de delete
+			ArrayList<Coluna> colunasPK = new ArrayList<Coluna>();
+			ArrayList<Object> dadosPK = new ArrayList<Object>();
+			TableRow aux = (TableRow) rowEscolhida;
+			
+			for (int l = 0; l < colunasParaVisualizacao.size(); l++) {
+				if(colunasParaVisualizacao.get(l).isPK()){
+					colunasPK.add(colunasParaVisualizacao.get(l));
+					
+					if(colunas.get(l).getTipo().equals("Varchar") || colunas.get(l).getTipo().equals("Text")){
+						dadosPK.add(((TextView) aux.getChildAt(l)).getText().toString());
+					}else{
+						dadosPK.add(Integer.parseInt(((TextView) aux.getChildAt(l)).getText().toString()));
+					}
+				}
+			}
+			
+			dbHelperUsuario.deleteRow(colunasPK, dadosPK, nameTabela);
+			Toast.makeText(this, "Row deleted!", Toast.LENGTH_SHORT).show();
+			
+			//para recriar a visualização da tabela de forma correta e completa, com os dados atualizados
+			Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+			i.putExtra("nameTable", nameTabela);
+			i.putExtra("tablesList", namesTables);
+			i.putExtra("DBName", DBName);
+			i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
+			i.putExtra("columnsList", colunas);
+			startActivity(i);
 		}
 
 		return true;
