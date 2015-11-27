@@ -224,6 +224,9 @@ public class EditDataActivity extends Activity {
 
 					final int index = j;
 					
+					uriImagem = dataRow.get(colunas.get(index).getNome())  + "";
+					allUris.put(colunas.get(j).getNome(),uriImagem);
+					
 					btnImagem.setOnClickListener(new OnClickListener() {
 
 						@Override
@@ -254,17 +257,7 @@ public class EditDataActivity extends Activity {
 								intent.setDataAndType(Uri.parse(path), "image/*");
 								startActivity(intent);
 							}else{
-								//Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
-								
-								//SE FOR NULO QUER DIZER QUE VEIO DO UPDATE, COM DADOS JA ESCOLHIDOS
-								//CRIAR INTENT COM O QUE TA NO BANCO
-								Bitmap inImage = BitmapFactory.decodeFile(dataRow.get(colunas.get(index).getNome())  + "");
-								ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-								inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-								String path = Images.Media.insertImage(getBaseContext().getContentResolver(), inImage, "Title", null);
-
-								intent.setDataAndType(Uri.parse(path), "image/*");
-								startActivity(intent);
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
 							}
 
 						}
@@ -282,6 +275,13 @@ public class EditDataActivity extends Activity {
 					layout.addView(btnVerVideo);
 
 					final int index = j;
+					
+					intentVideoPlayer = new Intent(Intent.ACTION_VIEW, 
+							Uri.parse((String) dataRow.get(colunas.get(index).getNome())));
+					intentVideoPlayer.setType("video/*");
+					intentVideoPlayer.setData(Uri.parse((String) dataRow.get(colunas.get(index).getNome())));
+					
+					allUris.put(colunas.get(j).getNome(), (Uri.parse((String) dataRow.get(colunas.get(index).getNome()))).toString());
 					
 					btnVideo.setOnClickListener(new OnClickListener() {
 
@@ -304,15 +304,7 @@ public class EditDataActivity extends Activity {
 							if(intentVideoPlayer != null){
 								startActivity(intentVideoPlayer);
 							}else{
-								//Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
-								
-								//SE FOR NULO QUER DIZER QUE VEIO DO UPDATE, COM DADOS JA ESCOLHIDOS
-								//CRIAR INTENT COM O QUE TA NO BANCO
-								intentVideoPlayer = new Intent(Intent.ACTION_VIEW, 
-										Uri.parse((String) dataRow.get(colunas.get(index).getNome())));
-								intentVideoPlayer.setType("video/*");
-								intentVideoPlayer.setData(Uri.parse((String) dataRow.get(colunas.get(index).getNome())));
-								startActivity(intentVideoPlayer);
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
 							}
 
 						}
@@ -334,6 +326,9 @@ public class EditDataActivity extends Activity {
 					layout.addView(btnPausarMusica);
 					
 					final int index = j;
+					
+					uriMusica = dataRow.get(colunas.get(index).getNome())  + "";
+					allUris.put(colunas.get(j).getNome(),uriMusica);
 
 					btnMusica.setOnClickListener(new OnClickListener() {
 
@@ -353,11 +348,7 @@ public class EditDataActivity extends Activity {
 							if(uriMusica != null){
 								play(getBaseContext(), Uri.parse(uriMusica)); 
 							}else{
-								//Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
-								
-								//SE FOR NULO QUER DIZER QUE VEIO DO UPDATE, COM DADOS JA ESCOLHIDOS
-								//CRIAR INTENT COM O QUE TA NO BANCO
-								play(getBaseContext(), Uri.parse(dataRow.get(colunas.get(index).getNome())  + ""));
+								Toast.makeText(getBaseContext(), "You haven't picked file", Toast.LENGTH_SHORT).show();
 							}
 
 						}
@@ -482,7 +473,13 @@ public class EditDataActivity extends Activity {
 				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 				uriImagem = cursor.getString(columnIndex);
 
-				allUris.put(auxNomesColunas.get(ordemEscolhida),uriImagem);
+				if(allUris.get(auxNomesColunas.get(ordemEscolhida)) == null){
+					allUris.put(auxNomesColunas.get(ordemEscolhida),uriImagem);
+				}else{
+					allUris.remove(auxNomesColunas.get(ordemEscolhida));
+					allUris.put(auxNomesColunas.get(ordemEscolhida),uriImagem);
+				}
+				
 
 				cursor.close();
 
@@ -492,7 +489,13 @@ public class EditDataActivity extends Activity {
 				Uri dataVideo = data.getData();
 				uriVideo = dataVideo.toString();
 
-				allUris.put(auxNomesColunas.get(ordemEscolhida),uriVideo);
+				if(allUris.get(auxNomesColunas.get(ordemEscolhida)) == null){
+					allUris.put(auxNomesColunas.get(ordemEscolhida),uriVideo);
+				}else{
+					allUris.remove(auxNomesColunas.get(ordemEscolhida));
+					allUris.put(auxNomesColunas.get(ordemEscolhida),uriVideo);
+				}
+				
 
 				intentVideoPlayer = new Intent(Intent.ACTION_VIEW, 
 						dataVideo);
@@ -504,8 +507,13 @@ public class EditDataActivity extends Activity {
 
 				Uri uriSound=data.getData();
 				uriMusica = getRealPathFromURI(getBaseContext(), uriSound);
-
-				allUris.put(auxNomesColunas.get(ordemEscolhida),uriMusica);
+				
+				if(allUris.get(auxNomesColunas.get(ordemEscolhida)) == null){
+					allUris.put(auxNomesColunas.get(ordemEscolhida),uriMusica);
+				}else{
+					allUris.remove(auxNomesColunas.get(ordemEscolhida));
+					allUris.put(auxNomesColunas.get(ordemEscolhida),uriMusica);
+				}
 
 			}else {
 				Toast.makeText(this, "You haven't picked file",
