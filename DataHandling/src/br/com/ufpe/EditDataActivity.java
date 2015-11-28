@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -214,10 +215,23 @@ public class EditDataActivity extends Activity {
 					final Button btnImagem = new Button(this);
 					btnImagem.setText("Select an image");
 					btnImagem.setId(ordemBotaoSelecionarBlob);
+					
+					btnImagem.setTextColor(Color.WHITE);
+					btnImagem.setTextSize(12);
+					LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, 80);
+					params.setMargins(0, 0, 0, 10);
+					btnImagem.setLayoutParams(params);
+					Drawable d = getResources().getDrawable(R.drawable.buttonshape);
+					btnImagem.setBackground(d);
+					
 					auxNomesColunas.put(ordemBotaoSelecionarBlob, colunas.get(j).getNome());
 
 					final Button btnVerImagem = new Button(this);
-					btnVerImagem.setText("see the image");
+					btnVerImagem.setText("See the image");
+					btnVerImagem.setTextColor(Color.WHITE);
+					btnVerImagem.setTextSize(12);
+					btnVerImagem.setLayoutParams(params);
+					btnVerImagem.setBackground(d);
 
 					layout.addView(btnImagem);
 					layout.addView(btnVerImagem);
@@ -266,10 +280,23 @@ public class EditDataActivity extends Activity {
 					final Button btnVideo = new Button(this);
 					btnVideo.setText("Select a movie");
 					btnVideo.setId(ordemBotaoSelecionarBlob);
+					
+					btnVideo.setTextColor(Color.WHITE);
+					btnVideo.setTextSize(12);
+					LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, 80);
+					params.setMargins(0, 0, 0, 10);
+					btnVideo.setLayoutParams(params);
+					Drawable d = getResources().getDrawable(R.drawable.buttonshape);
+					btnVideo.setBackground(d);
+					
 					auxNomesColunas.put(ordemBotaoSelecionarBlob, colunas.get(j).getNome());
 
 					final Button btnVerVideo = new Button(this);
-					btnVerVideo.setText("See the movie");
+					btnVerVideo.setText("Watch the movie");
+					btnVerVideo.setTextColor(Color.WHITE);
+					btnVerVideo.setTextSize(12);
+					btnVerVideo.setLayoutParams(params);
+					btnVerVideo.setBackground(d);
 
 					layout.addView(btnVideo);
 					layout.addView(btnVerVideo);
@@ -313,13 +340,30 @@ public class EditDataActivity extends Activity {
 					final Button btnMusica = new Button(this);
 					btnMusica.setText("Select a music");
 					btnMusica.setId(ordemBotaoSelecionarBlob);
+					
+					btnMusica.setTextColor(Color.WHITE);
+					btnMusica.setTextSize(12);
+					LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, 80);
+					params.setMargins(0, 0, 0, 10);
+					btnMusica.setLayoutParams(params);
+					Drawable d = getResources().getDrawable(R.drawable.buttonshape);
+					btnMusica.setBackground(d);
+					
 					auxNomesColunas.put(ordemBotaoSelecionarBlob, colunas.get(j).getNome());
 
 					final Button btnTocarMusica = new Button(this);
-					btnTocarMusica.setText("start music");
+					btnTocarMusica.setText("Play music");
+					btnTocarMusica.setTextColor(Color.WHITE);
+					btnTocarMusica.setTextSize(12);
+					btnTocarMusica.setLayoutParams(params);
+					btnTocarMusica.setBackground(d);
 
 					final Button btnPausarMusica = new Button(this);
-					btnPausarMusica.setText("pause music");
+					btnPausarMusica.setText("Pause music");
+					btnPausarMusica.setTextColor(Color.WHITE);
+					btnPausarMusica.setTextSize(12);
+					btnPausarMusica.setLayoutParams(params);
+					btnPausarMusica.setBackground(d);
 
 					layout.addView(btnMusica);
 					layout.addView(btnTocarMusica);
@@ -392,6 +436,15 @@ public class EditDataActivity extends Activity {
 
 		Button atualizarDado = new Button(this);
 		atualizarDado.setText("Update data");
+		
+		atualizarDado.setTextColor(Color.WHITE);
+		atualizarDado.setTextSize(12);
+		LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, 80);
+		params.setMargins(0, 0, 0, 10);
+		atualizarDado.setLayoutParams(params);
+		Drawable d = getResources().getDrawable(R.drawable.buttonshape);
+		atualizarDado.setBackground(d);
+		
 		layout.addView(atualizarDado);
 
 		atualizarDado.setOnClickListener(new OnClickListener() {
@@ -448,6 +501,34 @@ public class EditDataActivity extends Activity {
 				i.putExtra("columnsList", colunas);
 				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
 				startActivity(i);
+			}
+		});
+		
+		Button back = new Button(this);
+		back.setText("Back");
+		
+		back.setTextColor(Color.WHITE);
+		back.setTextSize(12);
+		LayoutParams paramsF = new LayoutParams(LayoutParams.FILL_PARENT, 80);
+		back.setLayoutParams(paramsF);
+		Drawable dF = getResources().getDrawable(R.drawable.buttonshape);
+		back.setBackground(dF);
+		
+		layout.addView(back);
+		
+		back.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				//voltar pra tela de visualização
+				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+				i.putExtra("DBName", DBName);
+				i.putExtra("nameTable", tableName);
+				i.putExtra("tablesList", namesTables);
+				i.putExtra("columnsList", colunas);
+				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
+				startActivity(i);
+				
 			}
 		});
 	}

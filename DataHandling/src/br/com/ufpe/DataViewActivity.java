@@ -53,6 +53,7 @@ public class DataViewActivity extends Activity {
 	private TableLayout headerTable;
 	private TableLayout dataTable;
 	private ScrollView scrollVertical;
+	private Button backToColumns;
 
 	private ArrayList<Coluna> colunas;
 	private ArrayList<Coluna> colunasParaVisualizacao;
@@ -188,8 +189,9 @@ public class DataViewActivity extends Activity {
 
 					}else if(path.substring(path.length()-3, path.length()).equals("mp3") || path.substring(path.length()-3, path.length()).equals("ogg") || path.substring(path.length()-3, path.length()).equals("aac")){ //musica
 						final Button btnVerBlob = new Button(this);
-						btnVerBlob.setText("MUS");
 						btnVerBlob.setId(Integer.parseInt(j + "" + k));
+						
+						btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.play));
 
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -206,8 +208,9 @@ public class DataViewActivity extends Activity {
 
 					}else{ //video
 						final Button btnVerBlob = new Button(this);
-						btnVerBlob.setText("VID");
 						btnVerBlob.setId(Integer.parseInt(j + "" + k));
+						
+						btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.video));
 
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -267,7 +270,6 @@ public class DataViewActivity extends Activity {
 		for (int j = 0; j < linhasDeDados.size(); j++) {
 			TableRow row = linhasDeDados.get(j);
 
-			//ATENÇÃO: MUDAR PARA LONGCLICK COM A ESCOLHA DE EDITAR OU DELETAR!
 			row.setOnLongClickListener(new OnLongClickListener() {
 
 				@Override
@@ -278,6 +280,19 @@ public class DataViewActivity extends Activity {
 			});
 		}
 
+		
+		backToColumns.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
+				i.putExtra("nameTable", nameTabela);
+				i.putExtra("tablesList", namesTables);
+				i.putExtra("DBName", DBName);
+				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
+				startActivity(i);
+			}
+		});
 
 
 	}
@@ -424,6 +439,8 @@ public class DataViewActivity extends Activity {
 
 		btnNovoDado = (Button) findViewById(R.id.btnNewData);
 		linhasDeDados = new ArrayList<TableRow>();
+		
+		backToColumns = (Button) findViewById(R.id.btnBackInDataView);
 
 		//preenchendo as colunas da visualização
 		Intent intent = getIntent();
