@@ -450,7 +450,7 @@ public class DataViewActivity extends Activity {
 		colunas = (ArrayList<Coluna>) intent.getExtras().get("columnsList");
 
 		//colunas especificas da tabela clicada
-		colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
+		colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabelaAndBanco(nameTabela, DBName);
 
 		tabelas = new ArrayList<Tabela>();
 		for (int i = 0; i < namesTables.size(); i++) {
@@ -519,7 +519,7 @@ public class DataViewActivity extends Activity {
 					for (int i = 0; i < tabelas.size(); i++) {
 						namesTables.add(tabelas.get(i).getNome());
 					}
-					colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabela(nameTabela);
+					colunasParaVisualizacao = (ArrayList<Coluna>) database.getColunasByTabelaAndBanco(nameTabela, DBName);
 
 				}
 			}

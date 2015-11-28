@@ -119,7 +119,7 @@ public class PopUpNewColumnActivity extends Activity {
 		});
 		
 		//evitando a criação de novas chaves caso já exista uma chave PK autoincremental
-		if(database.existePKAutoIncremental(nomeTabela)){
+		if(database.existePKAutoIncremental(nomeTabela, DBName)){
 			chkPK.setVisibility(View.GONE);
 			coluna.setPK(false);
 			coluna.setAutoincrement(false);
@@ -142,7 +142,7 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
-					if(!database.existePK(nomeTabela)){ //evitando a criação de autoincrement uma vez que já existe uma chave normal
+					if(!database.existePK(nomeTabela, DBName)){ //evitando a criação de autoincrement uma vez que já existe uma chave normal
 						chkAutoincrement.setVisibility(View.VISIBLE);
 					}else{
 						chkAutoincrement.setVisibility(View.GONE);
@@ -194,7 +194,7 @@ public class PopUpNewColumnActivity extends Activity {
 					coluna.setNomeTabelaFK((String) parent.getAdapter().getItem(position));
 					//quando selecionou uma tabela, seta a de colunasFK com as colunas dela
 					spnColumnFK.setVisibility(View.VISIBLE);
-					ArrayList<Coluna> colunas = (ArrayList<Coluna>) database.getColunasPKByTabela(coluna.getNomeTabelaFK());
+					ArrayList<Coluna> colunas = (ArrayList<Coluna>) database.getColunasPKByTabela(coluna.getNomeTabelaFK(), DBName);
 					ArrayList<String> nomeColuna = new ArrayList<String>();
 					nomeColuna.add("Select a FK column");
 					for (int i = 0; i < colunas.size(); i++) {
@@ -261,6 +261,7 @@ public class PopUpNewColumnActivity extends Activity {
 					coluna.setNome(edtNomeColuna.getText().toString());
 					coluna.setAutoincrement(chkAutoincrement.isChecked());
 					coluna.setNomeTabela(nomeTabela);
+					coluna.setNomeBanco(DBName);
 
 					boolean criou = false;
 					if(coluna.getTipo() != null){
@@ -386,7 +387,7 @@ public class PopUpNewColumnActivity extends Activity {
 			fk = 1;
 		}
 
-		long retorno = database.insertColuna(coluna.getNome(), coluna.getTipo(), nomeTabela, pk, autoincrement, fk, coluna.getNomeTabelaFK(), coluna.getNomeColunaFK(), coluna.getTipoBlob());
+		long retorno = database.insertColuna(coluna.getNome(), coluna.getTipo(), nomeTabela, pk, autoincrement, fk, coluna.getNomeTabelaFK(), coluna.getNomeColunaFK(), coluna.getTipoBlob(), coluna.getNomeBanco());
 
 		if(retorno == -1){
 			return false;

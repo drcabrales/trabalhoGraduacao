@@ -119,11 +119,11 @@ public class NewColumnActivity extends Activity {
 							temColunasOutrasTabelas = true;
 						}
 
-						if(colunas.get(k).getNomeTabela().equals(nomeTabela) && colunas.get(k).isPK()){
+						if(colunas.get(k).getNomeTabela().equals(namesTables.get(j)) && colunas.get(k).isPK()){
 							temPKOutrasTabelas = true;
 						}
 						
-						if(k >= colunas.size()){ //se chegou aqui e ambos os booleans não forem true, tem que verificar as outras tabelas
+						if(k >= colunas.size()-1){ //se chegou aqui e ambos os booleans não forem true, tem que verificar as outras tabelas
 							if(!temColunasOutrasTabelas || !temPKOutrasTabelas){
 								error = true;
 							}
@@ -209,7 +209,7 @@ public class NewColumnActivity extends Activity {
 		colunas = new ArrayList<Coluna>();
 
 		for (int i = 0; i < namesTables.size(); i++) {
-			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabela(namesTables.get(i)));
+			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabelaAndBanco(namesTables.get(i), DBName));
 		}
 
 		for (int i = 0; i < colunas.size(); i++) {
@@ -268,7 +268,7 @@ public class NewColumnActivity extends Activity {
 						}
 					}
 
-					database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
+					database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela, DBName);
 
 					for (int i = 0; i < namesColumns.size(); i++) {
 						if(namesColumns.get(i).equals(nomeColunaAAlterar)){
@@ -303,7 +303,7 @@ public class NewColumnActivity extends Activity {
 				}
 			}
 
-			database.deleteColuna(nomeColunaAAlterar, nomeTabela);
+			database.deleteColuna(nomeColunaAAlterar, nomeTabela, DBName);
 
 			for (int i = 0; i < namesColumns.size(); i++) {
 				if(namesColumns.get(i).equals(nomeColunaAAlterar)){
@@ -336,7 +336,7 @@ public class NewColumnActivity extends Activity {
 		colunas = new ArrayList<Coluna>();
 
 		for (int i = 0; i < namesTables.size(); i++) {
-			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabela(namesTables.get(i)));
+			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabelaAndBanco(namesTables.get(i), DBName));
 		}
 
 		for (int i = 0; i < colunas.size(); i++) {

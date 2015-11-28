@@ -29,7 +29,7 @@ public class DBHelper extends SQLiteOpenHelper{
              "create table "+ TABLE2_NAME +" (nome text not null, nomeBanco text not null, PRIMARY KEY (nome, nomeBanco), FOREIGN KEY(nomeBanco) REFERENCES "+TABLE1_NAME+" (nome));";
      
      private static final String DATABASE_CREATE_COLUNA =
-             "create table "+ TABLE3_NAME +" (nome text not null, tipo text not null, nomeTabela text not null, isPK integer, isAutoincrement integer, isFK integer, nomeTabelaFK text, nomeColunaFK text, tipoBlob text, PRIMARY KEY (nome, nomeTabela), FOREIGN KEY(nomeTabela) REFERENCES "+TABLE2_NAME+" (nome));";
+             "create table "+ TABLE3_NAME +" (nome text not null, tipo text not null, nomeTabela text not null, nomeBanco text not null, isPK integer, isAutoincrement integer, isFK integer, nomeTabelaFK text, nomeColunaFK text, tipoBlob text, PRIMARY KEY (nome, nomeTabela, nomeBanco), FOREIGN KEY(nomeTabela) REFERENCES "+TABLE2_NAME+" (nome), FOREIGN KEY(nomeBanco) REFERENCES Tabela(nomeBanco));";
      
      
 	public DBHelper(Context context) {
@@ -70,7 +70,7 @@ public class DBHelper extends SQLiteOpenHelper{
         return database.insert(TABLE2_NAME, null, initialValues);
 	}
 	
-	public long insertColuna(String nomeColuna, String tipo, String nomeTabela, int isPK, int isAutoincrement, int isFK, String nomeTabelaFK, String nomeColunaFK, String tipoBlob){
+	public long insertColuna(String nomeColuna, String tipo, String nomeTabela, int isPK, int isAutoincrement, int isFK, String nomeTabelaFK, String nomeColunaFK, String tipoBlob, String nomeBanco){
 		database = this.getWritableDatabase();
 		ContentValues initialValues = new ContentValues();
         initialValues.put("nome", nomeColuna);
@@ -80,6 +80,7 @@ public class DBHelper extends SQLiteOpenHelper{
         initialValues.put("isAutoincrement", isAutoincrement);
         initialValues.put("isFK", isFK);
         initialValues.put("tipoBlob", tipoBlob);
+        initialValues.put("nomeBanco", nomeBanco);
         
         if(nomeTabelaFK != null){
         	initialValues.put("nomeTabelaFK", nomeTabelaFK);
@@ -136,7 +137,7 @@ public class DBHelper extends SQLiteOpenHelper{
 	
 	public List<Coluna> getAllNomesColunas() {
         database = this.getReadableDatabase();
-        Cursor cursor = database.query(TABLE3_NAME, new String[] { "nome", "nomeTabela", "isPK", "isAutoincrement", "isFK", "nomeTabelaFK", "nomeColunaFK", "tipoBlob" }, null, null, null, null, null);
+        Cursor cursor = database.query(TABLE3_NAME, new String[] { "nome", "nomeTabela", "isPK", "isAutoincrement", "isFK", "nomeTabelaFK", "nomeColunaFK", "tipoBlob", "nomeBanco" }, null, null, null, null, null);
 
         List<Coluna> retorno = new ArrayList<Coluna>();
 
@@ -166,7 +167,7 @@ public class DBHelper extends SQLiteOpenHelper{
         	}
         	
         	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
-        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
+        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob, cursor.getString(cursor.getColumnIndex("nomeBanco")));
             retorno.add(coluna);
         }
 
@@ -186,9 +187,9 @@ public class DBHelper extends SQLiteOpenHelper{
         return retorno;
     }
 	
-	public List<Coluna> getColunasByTabela(String nomeTabela){
+	public List<Coluna> getColunasByTabelaAndBanco(String nomeTabela, String nomeBanco){
         database = this.getWritableDatabase();
-        Cursor cursor = database.rawQuery("select * from Coluna where nomeTabela = '" + nomeTabela + "'", null);
+        Cursor cursor = database.rawQuery("select * from Coluna where nomeTabela = '" + nomeTabela + "' and nomeBanco = '" + nomeBanco+ "'", null);
 
         List<Coluna> retorno = new ArrayList<Coluna>();
         while(cursor.moveToNext()){
@@ -217,16 +218,16 @@ public class DBHelper extends SQLiteOpenHelper{
         	}
         	
         	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
-        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
+        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob, nomeBanco);
         	retorno.add(coluna);
         }
 
         return retorno;
     }
 	
-	public List<Coluna> getColunasPKByTabela(String nomeTabela){
+	public List<Coluna> getColunasPKByTabela(String nomeTabela, String nomeBanco){
         database = this.getWritableDatabase();
-        Cursor cursor = database.rawQuery("select * from Coluna where nomeTabela = '" + nomeTabela + "'", null);
+        Cursor cursor = database.rawQuery("select * from Coluna where nomeTabela = '" + nomeTabela + "' and nomeBanco = '"+nomeBanco+"'", null);
 
         List<Coluna> retorno = new ArrayList<Coluna>();
         while(cursor.moveToNext()){
@@ -255,7 +256,7 @@ public class DBHelper extends SQLiteOpenHelper{
         	}
         	
         	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
-        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
+        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob, nomeBanco);
         	
         	if(coluna.isPK()){
         		retorno.add(coluna);
@@ -272,9 +273,9 @@ public class DBHelper extends SQLiteOpenHelper{
         return database.update("Tabela", initialValues, "nomeBanco" + "= '" + DBName + "' and nome = '" + tabelaAAlterar + "'", null) > 0;
     }
 	
-	public void updateReferenciaColunaTabela(String nomeNovaTabela, String nomeVelhaTabela){ //quando der update numa tabela, tem que dar update em suas referencias na coluna no campo "nomeTabela"
+	public void updateReferenciaColunaTabela(String nomeNovaTabela, String nomeVelhaTabela, String nomeBanco){ //quando der update numa tabela, tem que dar update em suas referencias na coluna no campo "nomeTabela"
 		 database = this.getWritableDatabase();
-		 database.execSQL("update Coluna set nomeTabela = '" + nomeNovaTabela + "' where nomeTabela = '" + nomeVelhaTabela + "'");
+		 database.execSQL("update Coluna set nomeTabela = '" + nomeNovaTabela + "' where nomeTabela = '" + nomeVelhaTabela + "' and nomeBanco = '" + nomeBanco+"'");
 	}
 	
 	public void deleteTabela(String tabela, String DBName){
@@ -282,21 +283,21 @@ public class DBHelper extends SQLiteOpenHelper{
         database.execSQL("delete from Tabela where nome = '" + tabela + "' and nomeBanco = '"+ DBName +"';");
     }
 	
-	public void deleteReferenciaColunaTabela(String nomeVelhaTabela){ //quando deletar a tabela, deleta as colunas que tem essa referencias
+	public void deleteReferenciaColunaTabela(String nomeVelhaTabela, String nomeBanco){ //quando deletar a tabela, deleta as colunas que tem essa referencias
 		 database = this.getWritableDatabase();
-	     database.execSQL("delete from Coluna where nomeTabela = '" + nomeVelhaTabela +"';");
+	     database.execSQL("delete from Coluna where nomeTabela = '" + nomeVelhaTabela +"' and nomeBanco ='"+ nomeBanco +"';");
 	}
 	
-	public boolean updateColuna(String colunaAAlterar, String coluna, String nomeTabela) {
+	public boolean updateColuna(String colunaAAlterar, String coluna, String nomeTabela, String nomeBanco) {
         database = this.getWritableDatabase();
         ContentValues initialValues = new ContentValues();
         initialValues.put("nome", coluna);
-        return database.update("Coluna", initialValues, "nomeTabela" + "= '" + nomeTabela + "' and nome = '" + colunaAAlterar + "'", null) > 0;
+        return database.update("Coluna", initialValues, "nomeTabela" + "= '" + nomeTabela + "' and nome = '" + colunaAAlterar + "' and nomeBanco ='" +nomeBanco+ "'", null) > 0;
     }
 	
-	public void deleteColuna(String coluna, String nomeTabela){
+	public void deleteColuna(String coluna, String nomeTabela, String nomeBanco){
         database = this.getWritableDatabase();
-        database.execSQL("delete from Coluna where nome = '" + coluna + "' and nomeTabela = '"+ nomeTabela +"';");
+        database.execSQL("delete from Coluna where nome = '" + coluna + "' and nomeTabela = '"+ nomeTabela +"' and nomeBanco = '"+nomeBanco+"';");
     }
 	
 	public void setFlagCriado(int flagCriado, String DBName){
@@ -320,9 +321,9 @@ public class DBHelper extends SQLiteOpenHelper{
         }
 	}
 	
-	public boolean existePKAutoIncremental(String nomeTabela){
+	public boolean existePKAutoIncremental(String nomeTabela, String nomeBanco){
 		boolean retorno = false;
-		ArrayList<Coluna> colunasAtuais = (ArrayList<Coluna>) getColunasByTabela(nomeTabela);
+		ArrayList<Coluna> colunasAtuais = (ArrayList<Coluna>) getColunasByTabelaAndBanco(nomeTabela, nomeBanco);
 		
 		for (int i = 0; i < colunasAtuais.size(); i++) {
 			if(colunasAtuais.get(i).isAutoincrement()){
@@ -333,9 +334,9 @@ public class DBHelper extends SQLiteOpenHelper{
 		return retorno;
 	}
 	
-	public boolean existePK(String nomeTabela){
+	public boolean existePK(String nomeTabela, String nomeBanco){
 		boolean retorno = false;
-		ArrayList<Coluna> colunasAtuais = (ArrayList<Coluna>) getColunasByTabela(nomeTabela);
+		ArrayList<Coluna> colunasAtuais = (ArrayList<Coluna>) getColunasByTabelaAndBanco(nomeTabela, nomeBanco);
 		
 		for (int i = 0; i < colunasAtuais.size(); i++) {
 			if(colunasAtuais.get(i).isPK()){

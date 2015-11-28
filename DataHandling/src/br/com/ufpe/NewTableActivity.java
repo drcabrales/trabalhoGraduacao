@@ -200,7 +200,7 @@ public class NewTableActivity extends Activity {
 					// edit text
 					listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null, null, null, null, null, null));
 					database.updateTabela(nomeTabelaAAlterar, userInput.getText().toString(), nomeDB);
-					database.updateReferenciaColunaTabela(userInput.getText().toString(), nomeTabelaAAlterar);
+					database.updateReferenciaColunaTabela(userInput.getText().toString(), nomeTabelaAAlterar, nomeDB);
 					
 					//alterando a lista de tabelas
 					for (int i = 0; i < namesTables.size(); i++) {
@@ -229,7 +229,7 @@ public class NewTableActivity extends Activity {
 		}else{
 			//escolha de delete no menu de tabelas
 			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null, null, null));
-			database.deleteReferenciaColunaTabela(nomeTabelaAAlterar);
+			database.deleteReferenciaColunaTabela(nomeTabelaAAlterar, nomeDB);
 			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
 			
 			//alterando a lista de tabelas
