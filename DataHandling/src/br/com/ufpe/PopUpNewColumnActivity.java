@@ -162,7 +162,7 @@ public class PopUpNewColumnActivity extends Activity {
 				// se é FK, habilita e preenche o spinner de tabelas desse banco
 				if(isChecked){
 					spnTableFK.setVisibility(View.VISIBLE);
-					List<Tabela> tabelas = database.getAllNomesTabelas();
+					List<Tabela> tabelas = database.getNomesTabelasByBanco(DBName);
 
 					for (int i = 0; i < tabelas.size(); i++) {
 						nomesTabelas.add(tabelas.get(i).getNome());
@@ -194,7 +194,7 @@ public class PopUpNewColumnActivity extends Activity {
 					coluna.setNomeTabelaFK((String) parent.getAdapter().getItem(position));
 					//quando selecionou uma tabela, seta a de colunasFK com as colunas dela
 					spnColumnFK.setVisibility(View.VISIBLE);
-					ArrayList<Coluna> colunas = (ArrayList<Coluna>) database.getColunasByTabela(coluna.getNomeTabelaFK());
+					ArrayList<Coluna> colunas = (ArrayList<Coluna>) database.getColunasPKByTabela(coluna.getNomeTabelaFK());
 					ArrayList<String> nomeColuna = new ArrayList<String>();
 					nomeColuna.add("Select a FK column");
 					for (int i = 0; i < colunas.size(); i++) {

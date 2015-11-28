@@ -338,6 +338,8 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 	public long insert(ArrayList<Coluna> colunas, ArrayList<Object> dados, String nomeTabela){
 		database = this.getWritableDatabase();
+		//para habilitar verificação de foreign key
+		database.execSQL("PRAGMA foreign_keys = ON;");
 		ContentValues initialValues = new ContentValues();
 
 		for (int i = 0; i < colunas.size(); i++) {
@@ -367,6 +369,8 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 	public void update(ArrayList<Coluna> colunas, ArrayList<Object> dados, String nomeTabela){
 		database = getWritableDatabase();
+		//para habilitar verificação de foreign key
+		database.execSQL("PRAGMA foreign_keys = ON;");
 		String query = "update " + nomeTabela + " set ";
 
 		//construção da string de update

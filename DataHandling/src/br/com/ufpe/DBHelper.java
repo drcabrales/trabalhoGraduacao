@@ -120,6 +120,20 @@ public class DBHelper extends SQLiteOpenHelper{
         return retorno;
     }
 	
+	public List<Tabela> getNomesTabelasByBanco(String nomeBanco){
+		database = this.getReadableDatabase();
+        Cursor cursor = database.query(TABLE2_NAME, new String[] { "nome", "nomeBanco" }, "nomeBanco =?", new String[] {nomeBanco}, null, null, null);
+
+        List<Tabela> retorno = new ArrayList<Tabela>();
+
+        while(cursor.moveToNext()){
+        	Tabela tabela = new Tabela(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("nomeBanco")));
+            retorno.add(tabela);
+        }
+
+        return retorno;
+	}
+	
 	public List<Coluna> getAllNomesColunas() {
         database = this.getReadableDatabase();
         Cursor cursor = database.query(TABLE3_NAME, new String[] { "nome", "nomeTabela", "isPK", "isAutoincrement", "isFK", "nomeTabelaFK", "nomeColunaFK", "tipoBlob" }, null, null, null, null, null);
@@ -205,6 +219,47 @@ public class DBHelper extends SQLiteOpenHelper{
         	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
         			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
         	retorno.add(coluna);
+        }
+
+        return retorno;
+    }
+	
+	public List<Coluna> getColunasPKByTabela(String nomeTabela){
+        database = this.getWritableDatabase();
+        Cursor cursor = database.rawQuery("select * from Coluna where nomeTabela = '" + nomeTabela + "'", null);
+
+        List<Coluna> retorno = new ArrayList<Coluna>();
+        while(cursor.moveToNext()){
+        	int pk = cursor.getInt(cursor.getColumnIndex("isPK"));
+        	int autoincrement = cursor.getInt(cursor.getColumnIndex("isAutoincrement"));
+        	int fk = cursor.getInt(cursor.getColumnIndex("isFK"));
+        	String tipoBlob = cursor.getString(cursor.getColumnIndex("tipoBlob"));
+        	
+        	boolean Bpk, BAutoincrement, Bfk;
+        	if(pk == 1){
+        		Bpk = true;
+        	}else{
+        		Bpk = false;
+        	}
+        	
+        	if(autoincrement == 1){
+        		BAutoincrement = true;
+        	}else{
+        		BAutoincrement = false;
+        	}
+        	
+        	if(fk == 1){
+        		Bfk = true;
+        	}else{
+        		Bfk = false;
+        	}
+        	
+        	Coluna coluna = new Coluna(cursor.getString(cursor.getColumnIndex("nome")), cursor.getString(cursor.getColumnIndex("tipo")), cursor.getString(cursor.getColumnIndex("nomeTabela")),
+        			Bpk, BAutoincrement, Bfk, cursor.getString(cursor.getColumnIndex("nomeTabelaFK")), cursor.getString(cursor.getColumnIndex("nomeColunaFK")), tipoBlob);
+        	
+        	if(coluna.isPK()){
+        		retorno.add(coluna);
+        	}
         }
 
         return retorno;

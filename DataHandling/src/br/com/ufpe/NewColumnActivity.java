@@ -96,19 +96,42 @@ public class NewColumnActivity extends Activity {
 				 * - vai para a tela de visualização de dados das colunas
 				 */
 
-				boolean temPk = false;
+				boolean temPkAtual = false;
 				int numColunasPorTabelaAtual = 0;
+
 				for (int j = 0; j < colunas.size(); j++) {
 					if(colunas.get(j).getNomeTabela().equals(nomeTabela)){
 						numColunasPorTabelaAtual++;
 					}
 
 					if(colunas.get(j).getNomeTabela().equals(nomeTabela) && colunas.get(j).isPK()){
-						temPk = true;
+						temPkAtual = true;
 					}
 				}
 
-				if(numColunasPorTabelaAtual > 0 && temPk){
+				boolean error = false;
+				for (int j = 0; j < namesTables.size() && !error; j++) {
+					boolean temPKOutrasTabelas= false;
+					boolean temColunasOutrasTabelas = false;
+					
+					for (int k = 0; k < colunas.size() && !(temColunasOutrasTabelas && temPKOutrasTabelas); k++) {
+						if(colunas.get(k).getNomeTabela().equals(namesTables.get(j))){
+							temColunasOutrasTabelas = true;
+						}
+
+						if(colunas.get(k).getNomeTabela().equals(nomeTabela) && colunas.get(k).isPK()){
+							temPKOutrasTabelas = true;
+						}
+						
+						if(k >= colunas.size()){ //se chegou aqui e ambos os booleans não forem true, tem que verificar as outras tabelas
+							if(!temColunasOutrasTabelas || !temPKOutrasTabelas){
+								error = true;
+							}
+						}
+					}
+				}
+
+				if(numColunasPorTabelaAtual > 0 && temPkAtual && !error){
 					//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
 					Intent i = new Intent(getBaseContext(), DataViewActivity.class);
 					i.putExtra("nameTable", nomeTabela);
@@ -122,8 +145,12 @@ public class NewColumnActivity extends Activity {
 						Toast.makeText(getBaseContext(), "Please, insert a column.", Toast.LENGTH_SHORT).show();
 					}
 
-					if(!temPk){
+					if(!temPkAtual){
 						Toast.makeText(getBaseContext(), "Please, insert a primary key column.", Toast.LENGTH_SHORT).show();
+					}
+					
+					if(error){
+						Toast.makeText(getBaseContext(), "Please, check if your tables has primary keys columns.", Toast.LENGTH_SHORT).show();
 					}
 				}
 
@@ -242,7 +269,7 @@ public class NewColumnActivity extends Activity {
 					}
 
 					database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
-					
+
 					for (int i = 0; i < namesColumns.size(); i++) {
 						if(namesColumns.get(i).equals(nomeColunaAAlterar)){
 							namesColumns.remove(i);
@@ -250,7 +277,7 @@ public class NewColumnActivity extends Activity {
 							adapter.notifyDataSetChanged();
 						}
 					}
-					
+
 					Toast.makeText(getBaseContext(), "Column edited!", Toast.LENGTH_SHORT).show();
 				}
 			})
