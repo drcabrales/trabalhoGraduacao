@@ -8,6 +8,7 @@ import br.com.ufpe.objects.Coluna;
 import br.com.ufpe.objects.Tabela;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class PopUpNewColumnActivity extends Activity {
@@ -69,6 +71,9 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
+				
+				((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+				
 				if(position != 0){
 					coluna.setTipo((String) parent.getAdapter().getItem(position));
 
@@ -95,6 +100,9 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
+				
+				((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+				
 				if(position != 0){
 					coluna.setTipoBlob((String) parent.getAdapter().getItem(position));
 				}else{
@@ -119,8 +127,8 @@ public class PopUpNewColumnActivity extends Activity {
 			chkPK.setVisibility(View.VISIBLE);
 		}
 		
-		//evitando a criação de pk e fk depois do banco já estar criado
-		if(database.getFlagCriado(DBName)){
+		//evitando a criação de pk e fk depois da tabela já estar criada
+		if(flagTabelaCriada){
 			chkPK.setVisibility(View.GONE);
 			coluna.setPK(false);
 			coluna.setAutoincrement(false);
@@ -179,6 +187,9 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
+				
+				((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+				
 				if(position != 0){
 					coluna.setNomeTabelaFK((String) parent.getAdapter().getItem(position));
 					//quando selecionou uma tabela, seta a de colunasFK com as colunas dela
@@ -213,6 +224,9 @@ public class PopUpNewColumnActivity extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
+				
+				((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+				
 				if(position != 0){
 					coluna.setNomeColunaFK((String) parent.getAdapter().getItem(position));
 				}else{

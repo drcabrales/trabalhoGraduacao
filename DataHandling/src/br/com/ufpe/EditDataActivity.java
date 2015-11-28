@@ -186,7 +186,7 @@ public class EditDataActivity extends Activity {
 				ArrayList<String> listaBool = new ArrayList<String>();
 				listaBool.add("True");
 				listaBool.add("False");
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listaBool);
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_item_white, listaBool);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				campo.setAdapter(adapter);
 

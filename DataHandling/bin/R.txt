@@ -602,7 +602,8 @@ int layout prompts 0x7f03002b
 int layout select_dialog_item_material 0x7f03002c
 int layout select_dialog_multichoice_material 0x7f03002d
 int layout select_dialog_singlechoice_material 0x7f03002e
-int layout support_simple_spinner_dropdown_item 0x7f03002f
+int layout spinner_item_white 0x7f03002f
+int layout support_simple_spinner_dropdown_item 0x7f030030
 int menu data_view 0x7f0c0000
 int menu edit_data 0x7f0c0001
 int menu global 0x7f0c0002

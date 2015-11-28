@@ -36,6 +36,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -171,9 +173,10 @@ public class NewDataActivity extends Activity {
 				ArrayList<String> listaBool = new ArrayList<String>();
 				listaBool.add("True");
 				listaBool.add("False");
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listaBool);
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_item_white, listaBool);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				campo.setAdapter(adapter);
+				
 				allSpns.add(campo);
 				layout.addView(campo);
 
