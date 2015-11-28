@@ -95,38 +95,38 @@ public class NewColumnActivity extends Activity {
 				 * - cria ou atualiza o banco e tabelas do usuário
 				 * - vai para a tela de visualização de dados das colunas
 				 */
-
-				//preenchendo tabelas e colunas para finalmente criar o banco
-				/*tabelas = (ArrayList<Tabela>) database.getTabelasByBanco(DBName);
-				colunas = new ArrayList<Coluna>();
-
-				for (int i = 0; i < tabelas.size(); i++) {
-					colunas.addAll(database.getColunasByTabela(tabelas.get(i).getNome()));
-				}
-
-				//chamando método de criação do banco com tabelas e colunas
-				database.createUserDatabase(getBaseContext(), DBName, tabelas, colunas);*/
-				//------------------------------------------------------------------------
 				
-				//-------------- TALVEZ DESCOMENTAR ISSO ---------
-				/*
-				//faz as alterações necessárias no banco
-				for (int j = 0; j < listaAlteracao.size(); j++) {
-					if(listaAlteracao.get(j).getTipoAlteracao().equals("altNomeColuna")){
-						 database.updateColuna(listaAlteracao.get(j).getNomeVelhoColuna(), listaAlteracao.get(j).getNomeNovoColuna(), nomeTabela);
-					}else if(listaAlteracao.get(j).getTipoAlteracao().equals("delColuna")){
-						database.deleteColuna(listaAlteracao.get(j).getDelColuna(), nomeTabela);
+				boolean temPk = false;
+				int numColunasPorTabelaAtual = 0;
+				for (int j = 0; j < colunas.size(); j++) {
+					if(colunas.get(j).getNomeTabela().equals(nomeTabela)){
+						numColunasPorTabelaAtual++;
 					}
-				}*/
-
-				//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
-				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
-				i.putExtra("nameTable", nomeTabela);
-				i.putExtra("tablesList", namesTables);
-				i.putExtra("DBName", DBName);
-				i.putExtra("listaAlteracao", listaAlteracao);
-				i.putExtra("columnsList", colunas);
-				startActivity(i);
+					
+					if(colunas.get(j).getNomeTabela().equals(nomeTabela) && colunas.get(j).isPK()){
+						temPk = true;
+					}
+				}
+				
+				if(numColunasPorTabelaAtual > 0 && temPk){
+					//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
+					Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+					i.putExtra("nameTable", nomeTabela);
+					i.putExtra("tablesList", namesTables);
+					i.putExtra("DBName", DBName);
+					i.putExtra("listaAlteracao", listaAlteracao);
+					i.putExtra("columnsList", colunas);
+					startActivity(i);
+				}else{
+					if(numColunasPorTabelaAtual == 0){
+						Toast.makeText(getBaseContext(), "Please, insert a column.", Toast.LENGTH_SHORT).show();
+					}
+					
+					if(!temPk){
+						Toast.makeText(getBaseContext(), "Please, insert a primary key column.", Toast.LENGTH_SHORT).show();
+					}
+				}
+				
 			}
 		});
 
