@@ -201,6 +201,17 @@ public class NewTableActivity extends Activity {
 					listaAlteracao.add(new Alteracao("altNomeTabela", nomeTabelaAAlterar, userInput.getText().toString(), null, null, null, null, null, null, null, null, null));
 					database.updateTabela(nomeTabelaAAlterar, userInput.getText().toString(), nomeDB);
 					database.updateReferenciaColunaTabela(userInput.getText().toString(), nomeTabelaAAlterar);
+					
+					//alterando a lista de tabelas
+					for (int i = 0; i < namesTables.size(); i++) {
+						if(namesTables.get(i).equals(nomeTabelaAAlterar)){
+							namesTables.remove(i);
+							namesTables.add(userInput.getText().toString());
+							adapter.notifyDataSetChanged();
+						}
+					}
+					
+					Toast.makeText(getBaseContext(), "Table edited!", Toast.LENGTH_SHORT).show();
 				}
 			})
 			.setNegativeButton("Cancel",
@@ -220,6 +231,15 @@ public class NewTableActivity extends Activity {
 			listaAlteracao.add(new Alteracao("delTabela", null, null, null, null, nomeTabelaAAlterar, null, null, null, null, null, null));
 			database.deleteReferenciaColunaTabela(nomeTabelaAAlterar);
 			database.deleteTabela(nomeTabelaAAlterar, nomeDB);
+			
+			//alterando a lista de tabelas
+			for (int i = 0; i < namesTables.size(); i++) {
+				if(namesTables.get(i).equals(nomeTabelaAAlterar)){
+					namesTables.remove(i);
+					adapter.notifyDataSetChanged();
+				}
+			}
+			
 			Toast.makeText(this, "Table deleted!", Toast.LENGTH_SHORT).show();
 		}
 

@@ -151,7 +151,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			Alteracao aux = listAlteracao.get(i);
 
 			if(aux.getTipoAlteracao().equals("altNomeTabela")){
-				database.execSQL("alter table " +aux.getNomeVelhoTabela() + "rename to " + aux.getNomeNovoTabela());
+				database.execSQL("alter table " +aux.getNomeVelhoTabela() + " rename to " + aux.getNomeNovoTabela());
 			}else if(aux.getTipoAlteracao().equals("delTabela")){
 				database.execSQL("DROP TABLE IF EXISTS " + aux.getDelTabela());
 			}else if(aux.getTipoAlteracao().equals("addTabela")){

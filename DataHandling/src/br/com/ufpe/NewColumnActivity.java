@@ -95,19 +95,19 @@ public class NewColumnActivity extends Activity {
 				 * - cria ou atualiza o banco e tabelas do usuário
 				 * - vai para a tela de visualização de dados das colunas
 				 */
-				
+
 				boolean temPk = false;
 				int numColunasPorTabelaAtual = 0;
 				for (int j = 0; j < colunas.size(); j++) {
 					if(colunas.get(j).getNomeTabela().equals(nomeTabela)){
 						numColunasPorTabelaAtual++;
 					}
-					
+
 					if(colunas.get(j).getNomeTabela().equals(nomeTabela) && colunas.get(j).isPK()){
 						temPk = true;
 					}
 				}
-				
+
 				if(numColunasPorTabelaAtual > 0 && temPk){
 					//CHAMAR A TELA DE VISUALIZAÇÃO/INSERÇÃO DE DADOS
 					Intent i = new Intent(getBaseContext(), DataViewActivity.class);
@@ -121,12 +121,12 @@ public class NewColumnActivity extends Activity {
 					if(numColunasPorTabelaAtual == 0){
 						Toast.makeText(getBaseContext(), "Please, insert a column.", Toast.LENGTH_SHORT).show();
 					}
-					
+
 					if(!temPk){
 						Toast.makeText(getBaseContext(), "Please, insert a primary key column.", Toast.LENGTH_SHORT).show();
 					}
 				}
-				
+
 			}
 		});
 
@@ -170,21 +170,21 @@ public class NewColumnActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
 		menu.add("Edit");
 		menu.add("Delete");
-		
+
 		colunasAlt = new ArrayList<Coluna>();
 		//pegar colunas novamente
 		colunas = new ArrayList<Coluna>();
-		
+
 		for (int i = 0; i < namesTables.size(); i++) {
 			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabela(namesTables.get(i)));
 		}
-		
+
 		for (int i = 0; i < colunas.size(); i++) {
 			if(colunas.get(i).getNomeTabela().equals(nomeTabela)){
 				Coluna aux = new Coluna();
@@ -200,13 +200,13 @@ public class NewColumnActivity extends Activity {
 				colunasAlt.add(aux);
 			}
 		}
-		
+
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
 		super.onContextItemSelected(item);
-		
+
 		if(item.getTitle().equals("Edit")){
 			//escolha de edição no menu de colunas
 			// get prompts.xml view
@@ -224,15 +224,15 @@ public class NewColumnActivity extends Activity {
 
 			// set dialog message
 			alertDialogBuilder
-				.setCancelable(false)
-				.setPositiveButton("OK",
-				  new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog,int id) {
+			.setCancelable(false)
+			.setPositiveButton("OK",
+					new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
 					// get user input and set it to result
 					// edit text
-				    listaAlteracao.add(new Alteracao("altNomeColuna", null, null, nomeColunaAAlterar, userInput.getText().toString(), null, null, namesTables, colunasAlt, DBName, null, null));
-				    
-				    for (int i = 0; i < colunasAlt.size(); i++) {
+					listaAlteracao.add(new Alteracao("altNomeColuna", null, null, nomeColunaAAlterar, userInput.getText().toString(), null, null, namesTables, colunasAlt, DBName, null, null));
+
+					for (int i = 0; i < colunasAlt.size(); i++) {
 						if(colunasAlt.get(i).getNome().equals(nomeColunaAAlterar)){
 							Coluna aux = colunasAlt.get(i);
 							aux.setNome(userInput.getText().toString());
@@ -240,16 +240,26 @@ public class NewColumnActivity extends Activity {
 							colunasAlt.add(aux);
 						}
 					}
-				    
-				    database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
-				    }
-				  })
-				.setNegativeButton("Cancel",
-				  new DialogInterface.OnClickListener() {
-				    public void onClick(DialogInterface dialog,int id) {
+
+					database.updateColuna(nomeColunaAAlterar, userInput.getText().toString(), nomeTabela);
+					
+					for (int i = 0; i < namesColumns.size(); i++) {
+						if(namesColumns.get(i).equals(nomeColunaAAlterar)){
+							namesColumns.remove(i);
+							namesColumns.add(userInput.getText().toString());
+							adapter.notifyDataSetChanged();
+						}
+					}
+					
+					Toast.makeText(getBaseContext(), "Column edited!", Toast.LENGTH_SHORT).show();
+				}
+			})
+			.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
 					dialog.cancel();
-				    }
-				  });
+				}
+			});
 
 			// create alert dialog
 			AlertDialog alertDialog = alertDialogBuilder.create();
@@ -259,17 +269,25 @@ public class NewColumnActivity extends Activity {
 		}else{
 			//escolha de delete no menu de tabelas
 			listaAlteracao.add(new Alteracao("delColuna", null, null, null, null, null, nomeColunaAAlterar, namesTables, colunasAlt, DBName, null, null));
-			
+
 			for (int i = 0; i < colunasAlt.size(); i++) {
 				if(colunasAlt.get(i).getNome().equals(nomeColunaAAlterar)){
 					colunasAlt.remove(i);
 				}
 			}
-			
+
 			database.deleteColuna(nomeColunaAAlterar, nomeTabela);
+
+			for (int i = 0; i < namesColumns.size(); i++) {
+				if(namesColumns.get(i).equals(nomeColunaAAlterar)){
+					namesColumns.remove(i);
+					adapter.notifyDataSetChanged();
+				}
+			}
+
 			Toast.makeText(this, "Column deleted!", Toast.LENGTH_SHORT).show();
 		}
-		
+
 		return true;
 	}
 
@@ -289,11 +307,11 @@ public class NewColumnActivity extends Activity {
 		//preencher namesColumns com as colunas vindas do sistema (que o usuário já inseriu previamente)
 		namesColumns = new ArrayList<String>();
 		colunas = new ArrayList<Coluna>();
-		
+
 		for (int i = 0; i < namesTables.size(); i++) {
 			colunas.addAll((ArrayList<Coluna>) database.getColunasByTabela(namesTables.get(i)));
 		}
-		
+
 		for (int i = 0; i < colunas.size(); i++) {
 			if(colunas.get(i).getNomeTabela().equals(nomeTabela)){
 				namesColumns.add(colunas.get(i).getNome());				
@@ -312,8 +330,8 @@ public class NewColumnActivity extends Activity {
 		listColumns.setAdapter(adapter);
 		//registrando para no clique longo aparecer menu de contexto
 		registerForContextMenu(listColumns);
-		
-		
+
+
 		namesTablesAlt = new ArrayList<String>();
 		for (int i = 0; i < namesTables.size(); i++) {
 			namesTablesAlt.add(namesTables.get(i));
