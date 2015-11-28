@@ -119,6 +119,7 @@ public class EditDataActivity extends Activity {
 				EditText campo = new EditText(this);
 				campo.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 				campo.setText((CharSequence) dataRow.get(colunas.get(j).getNome()));
+				campo.setTextColor(Color.WHITE);
 				allEds.add(campo);
 				layout.addView(campo);
 				
@@ -140,6 +141,7 @@ public class EditDataActivity extends Activity {
 				campo.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 				campo.setInputType(InputType.TYPE_CLASS_NUMBER);
 				campo.setText(dataRow.get(colunas.get(j).getNome()) + "");
+				campo.setTextColor(Color.WHITE);
 				allEds.add(campo);
 				layout.addView(campo);
 				
@@ -161,6 +163,7 @@ public class EditDataActivity extends Activity {
 				campo.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 				campo.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 				campo.setText(dataRow.get(colunas.get(j).getNome())  + "");
+				campo.setTextColor(Color.WHITE);
 				allEds.add(campo);
 				layout.addView(campo);
 				

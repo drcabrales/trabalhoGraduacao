@@ -113,6 +113,7 @@ public class NewDataActivity extends Activity {
 		//blob: botão para escolher qual tipo de blob é e de onde ele deve pegar o dado (arquivo do sistema)
 		//boolean: spinner com true e false
 		for (int j = 0; j < colunas.size(); j++) {
+			
 			if(colunas.get(j).getTipo().equals("Text") || colunas.get(j).getTipo().equals("Varchar")){
 				TextView nomeColuna = new TextView(this);
 				nomeColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -123,6 +124,7 @@ public class NewDataActivity extends Activity {
 
 				EditText campo = new EditText(this);
 				campo.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+				campo.setTextColor(Color.WHITE);
 				allEds.add(campo);
 				layout.addView(campo);
 
@@ -137,6 +139,7 @@ public class NewDataActivity extends Activity {
 				EditText campo = new EditText(this);
 				campo.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 				campo.setInputType(InputType.TYPE_CLASS_NUMBER);
+				campo.setTextColor(Color.WHITE);
 				allEds.add(campo);
 				layout.addView(campo);
 
@@ -151,6 +154,7 @@ public class NewDataActivity extends Activity {
 				EditText campo = new EditText(this);
 				campo.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
 				campo.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+				campo.setTextColor(Color.WHITE);
 				allEds.add(campo);
 				layout.addView(campo);
 
