@@ -26,10 +26,10 @@ public class DBHelper extends SQLiteOpenHelper{
              "create table "+ TABLE1_NAME +" (nome text not null, flagCriado integer, PRIMARY KEY (nome));";
      
      private static final String DATABASE_CREATE_TABELA =
-             "create table "+ TABLE2_NAME +" (nome text not null, nomeBanco text not null, PRIMARY KEY (nome), FOREIGN KEY(nomeBanco) REFERENCES "+TABLE1_NAME+" (nome));";
+             "create table "+ TABLE2_NAME +" (nome text not null, nomeBanco text not null, PRIMARY KEY (nome, nomeBanco), FOREIGN KEY(nomeBanco) REFERENCES "+TABLE1_NAME+" (nome));";
      
      private static final String DATABASE_CREATE_COLUNA =
-             "create table "+ TABLE3_NAME +" (nome text not null, tipo text not null, nomeTabela text not null, isPK integer, isAutoincrement integer, isFK integer, nomeTabelaFK text, nomeColunaFK text, tipoBlob text, PRIMARY KEY (nome), FOREIGN KEY(nomeTabela) REFERENCES "+TABLE2_NAME+" (nome));";
+             "create table "+ TABLE3_NAME +" (nome text not null, tipo text not null, nomeTabela text not null, isPK integer, isAutoincrement integer, isFK integer, nomeTabelaFK text, nomeColunaFK text, tipoBlob text, PRIMARY KEY (nome, nomeTabela), FOREIGN KEY(nomeTabela) REFERENCES "+TABLE2_NAME+" (nome));";
      
      
 	public DBHelper(Context context) {

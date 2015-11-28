@@ -127,8 +127,8 @@ public class PopUpNewColumnActivity extends Activity {
 			chkPK.setVisibility(View.VISIBLE);
 		}
 		
-		//evitando a criação de pk e fk depois da tabela já estar criada
-		if(flagTabelaCriada){
+		//evitando a criação de pk e fk depois da tabela já estar criada em um banco já criado
+		if(database.getFlagCriado(DBName) && flagTabelaCriada){
 			chkPK.setVisibility(View.GONE);
 			coluna.setPK(false);
 			coluna.setAutoincrement(false);

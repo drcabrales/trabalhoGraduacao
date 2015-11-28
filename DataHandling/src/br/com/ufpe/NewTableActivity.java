@@ -96,7 +96,7 @@ public class NewTableActivity extends Activity {
 							//não starta nova activity pq ele pode criar n tabelas,
 							//e depois acessar a que deseja para prosseguir
 						}else{
-							Toast.makeText(getBaseContext(), "A database with this name already exists!", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getBaseContext(), "A table with this name already exists!", Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
