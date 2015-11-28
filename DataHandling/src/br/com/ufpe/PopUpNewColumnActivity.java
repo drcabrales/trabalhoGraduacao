@@ -109,13 +109,36 @@ public class PopUpNewColumnActivity extends Activity {
 
 			}
 		});
+		
+		//evitando a criação de novas chaves caso já exista uma chave PK autoincremental
+		if(database.existePKAutoIncremental(nomeTabela)){
+			chkPK.setVisibility(View.GONE);
+			coluna.setPK(false);
+			coluna.setAutoincrement(false);
+		}else{
+			chkPK.setVisibility(View.VISIBLE);
+		}
+		
+		//evitando a criação de pk e fk depois do banco já estar criado
+		if(database.getFlagCriado(DBName)){
+			chkPK.setVisibility(View.GONE);
+			coluna.setPK(false);
+			coluna.setAutoincrement(false);
+			
+			chkFK.setVisibility(View.GONE);
+			coluna.setFK(false);
+		}
 
 		chkPK.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if(isChecked){
-					chkAutoincrement.setVisibility(View.VISIBLE);
+					if(!database.existePK(nomeTabela)){ //evitando a criação de autoincrement uma vez que já existe uma chave normal
+						chkAutoincrement.setVisibility(View.VISIBLE);
+					}else{
+						chkAutoincrement.setVisibility(View.GONE);
+					}
 					coluna.setPK(isChecked);
 				}else{
 					chkAutoincrement.setVisibility(View.GONE);

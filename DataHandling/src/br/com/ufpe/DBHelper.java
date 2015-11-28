@@ -265,6 +265,32 @@ public class DBHelper extends SQLiteOpenHelper{
         }
 	}
 	
+	public boolean existePKAutoIncremental(String nomeTabela){
+		boolean retorno = false;
+		ArrayList<Coluna> colunasAtuais = (ArrayList<Coluna>) getColunasByTabela(nomeTabela);
+		
+		for (int i = 0; i < colunasAtuais.size(); i++) {
+			if(colunasAtuais.get(i).isAutoincrement()){
+				retorno = true;
+			}
+		}
+		
+		return retorno;
+	}
+	
+	public boolean existePK(String nomeTabela){
+		boolean retorno = false;
+		ArrayList<Coluna> colunasAtuais = (ArrayList<Coluna>) getColunasByTabela(nomeTabela);
+		
+		for (int i = 0; i < colunasAtuais.size(); i++) {
+			if(colunasAtuais.get(i).isPK()){
+				retorno = true;
+			}
+		}
+		
+		return retorno;
+	}
+	
 	//método responsável por criar os bancos de dados do usuário
 	public DBHelperUsuario createUserDatabase(Context context, String nomeBanco, ArrayList<Tabela> tabelas, ArrayList<Coluna> colunas){
 		DBHelperUsuario helperUsu = new DBHelperUsuario(context, nomeBanco, tabelas, colunas);
