@@ -449,16 +449,22 @@ public class NewDataActivity extends Activity {
 					//verificando o tipo de coluna para saber onde buscar seu dado corretamente
 				}
 				//chamar o database usuario e inserir
-				dbUsuario.insert(colunas, allData, tableName);
+				Long retorno = dbUsuario.insert(colunas, allData, tableName);
 
-				//voltar pra tela de visualização
-				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
-				i.putExtra("DBName", DBName);
-				i.putExtra("nameTable", tableName);
-				i.putExtra("tablesList", namesTables);
-				i.putExtra("columnsList", colunas);
-				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
-				startActivity(i);
+				if(retorno != -1){
+					//voltar pra tela de visualização
+					Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+					i.putExtra("DBName", DBName);
+					i.putExtra("nameTable", tableName);
+					i.putExtra("tablesList", namesTables);
+					i.putExtra("columnsList", colunas);
+					i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
+					startActivity(i);
+				}else{
+					Toast.makeText(getBaseContext(), "An error has ocurred, please verify your data.", Toast.LENGTH_SHORT).show();
+					allData = new ArrayList<Object>();
+				}
+				
 			}
 		});
 		

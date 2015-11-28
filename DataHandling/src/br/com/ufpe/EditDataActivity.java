@@ -494,16 +494,22 @@ public class EditDataActivity extends Activity {
 					}
 				}
 				//chamar o database usuario e atualizar
-				dbUsuario.update(colunas, allData, tableName);
+				Long retorno = dbUsuario.update(colunas, allData, tableName);
 
-				//voltar pra tela de visualização
-				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
-				i.putExtra("DBName", DBName);
-				i.putExtra("nameTable", tableName);
-				i.putExtra("tablesList", namesTables);
-				i.putExtra("columnsList", colunas);
-				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
-				startActivity(i);
+				if(retorno != -1){
+					//voltar pra tela de visualização
+					Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+					i.putExtra("DBName", DBName);
+					i.putExtra("nameTable", tableName);
+					i.putExtra("tablesList", namesTables);
+					i.putExtra("columnsList", colunas);
+					i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
+					startActivity(i);
+				}else{
+					Toast.makeText(getBaseContext(), "An error has ocurred, please verify your data.", Toast.LENGTH_SHORT).show();
+					allData = new ArrayList<Object>();
+				}
+				
 			}
 		});
 		

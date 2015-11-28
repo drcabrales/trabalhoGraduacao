@@ -270,10 +270,11 @@ public class PopUpNewColumnActivity extends Activity {
 						criou = criarColuna(coluna);
 					}else{
 						//ver pq n ta rolando
-						Toast.makeText(getBaseContext(), "Select the column type", Toast.LENGTH_SHORT);
+						Toast.makeText(getBaseContext(), "Select the column type", Toast.LENGTH_SHORT).show();
 					}
 
 					if(criou){
+						Toast.makeText(getBaseContext(), "Column added!", Toast.LENGTH_SHORT).show();
 						Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
 						i.putExtra("nameTable", nomeTabela);
 						i.putExtra("tablesList", namesTables);
@@ -281,7 +282,7 @@ public class PopUpNewColumnActivity extends Activity {
 						i.putExtra("listaAlteracao", listaAlteracao);
 						startActivity(i);
 					}else{
-						Toast.makeText(getBaseContext(), "It's not possible to create the column", Toast.LENGTH_SHORT);
+						Toast.makeText(getBaseContext(), "It's not possible to create the column", Toast.LENGTH_SHORT).show();
 					}
 
 

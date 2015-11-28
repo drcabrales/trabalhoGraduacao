@@ -60,7 +60,7 @@ public class NewDatabaseActivity extends Activity {
 					if(criou){
 						namesDatabases.add(edtNewDatabaseName.getText().toString());
 						adapter.notifyDataSetChanged();
-						
+						Toast.makeText(getBaseContext(), "Database added!", Toast.LENGTH_SHORT).show();
 						//starta a nova activity
 						Intent intent = new Intent(getBaseContext(), NewTableActivity.class);
 						intent.putExtra("DBName", edtNewDatabaseName.getText().toString());

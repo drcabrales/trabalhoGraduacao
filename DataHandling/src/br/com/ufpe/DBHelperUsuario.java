@@ -367,7 +367,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 		return retorno;
 	}
 
-	public void update(ArrayList<Coluna> colunas, ArrayList<Object> dados, String nomeTabela){
+	public Long update(ArrayList<Coluna> colunas, ArrayList<Object> dados, String nomeTabela){
 		database = getWritableDatabase();
 		//para habilitar verificação de foreign key
 		database.execSQL("PRAGMA foreign_keys = ON;");
@@ -427,7 +427,12 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			}
 		}
 
-		database.execSQL(query);
+		try{
+			database.execSQL(query);
+			return (long) 1;
+		}catch(Exception e){
+			return (long) -1;
+		}
 	}
 	
 	public void deleteRow(ArrayList<Coluna> colunas, ArrayList<Object> dados, String tableName){
