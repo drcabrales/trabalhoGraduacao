@@ -98,6 +98,13 @@ public class NewDataActivity extends Activity {
 		setContentView(R.layout.activity_new_data);
 
 		inicarComponentes();
+		
+		//verifica se existe alguma coluna com chave autoincremental, se sim, retirar da lista (pois não pode-se inserir dados nessa coluna)
+		for (int i = 0; i < colunas.size(); i++) {
+			if(colunas.get(i).isPK() && colunas.get(i).isAutoincrement()){
+				colunas.remove(i);
+			}
+		}
 
 		//esse for vai ver de qual tipo as colunas são, para colocar o tipo de inserção apropriado
 		//text, varchar: edittext
