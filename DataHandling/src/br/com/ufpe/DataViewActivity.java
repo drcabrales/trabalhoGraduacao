@@ -207,27 +207,30 @@ public class DataViewActivity extends Activity {
 						linha.addView(btnVerBlob);
 
 					}else{ //video
-						final Button btnVerBlob = new Button(this);
-						btnVerBlob.setId(Integer.parseInt(j + "" + k));
-						
-						btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.video));
+						//verificação para, se entrar uma nova coluna tipo blob (como é nova, não vai ter extensão) não cair como video
+						if(!(auxDadosBlob.get(Integer.parseInt(j + "" + k)).equals("null"))){
+							final Button btnVerBlob = new Button(this);
+							btnVerBlob.setId(Integer.parseInt(j + "" + k));
+							
+							btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.video));
 
-						btnVerBlob.setOnClickListener(new OnClickListener() {
+							btnVerBlob.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								//teste com video
+								@Override
+								public void onClick(View v) {
+									//teste com video
 
 
-								Intent intentVideoPlayer = new Intent(Intent.ACTION_VIEW, Uri.parse(auxDadosBlob.get(btnVerBlob.getId())));
-								intentVideoPlayer.setType("video/*");
-								intentVideoPlayer.setData(Uri.parse(path));
-								startActivity(intentVideoPlayer);
+									Intent intentVideoPlayer = new Intent(Intent.ACTION_VIEW, Uri.parse(auxDadosBlob.get(btnVerBlob.getId())));
+									intentVideoPlayer.setType("video/*");
+									intentVideoPlayer.setData(Uri.parse(path));
+									startActivity(intentVideoPlayer);
 
-							}
-						});
+								}
+							});
 
-						linha.addView(btnVerBlob);
+							linha.addView(btnVerBlob);
+						}
 					}
 
 				}
