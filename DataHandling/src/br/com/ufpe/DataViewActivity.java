@@ -394,17 +394,23 @@ public class DataViewActivity extends Activity {
 				}
 			}
 			
-			dbHelperUsuario.deleteRow(colunasPK, dadosPK, nameTabela);
-			Toast.makeText(this, "Row deleted!", Toast.LENGTH_SHORT).show();
+			Long retorno = dbHelperUsuario.deleteRow(colunasPK, dadosPK, nameTabela);
 			
-			//para recriar a visualização da tabela de forma correta e completa, com os dados atualizados
-			Intent i = new Intent(getBaseContext(), DataViewActivity.class);
-			i.putExtra("nameTable", nameTabela);
-			i.putExtra("tablesList", namesTables);
-			i.putExtra("DBName", DBName);
-			i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
-			i.putExtra("columnsList", colunas);
-			startActivity(i);
+			if(retorno != -1){
+				Toast.makeText(this, "Row deleted!", Toast.LENGTH_SHORT).show();
+				
+				//para recriar a visualização da tabela de forma correta e completa, com os dados atualizados
+				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
+				i.putExtra("nameTable", nameTabela);
+				i.putExtra("tablesList", namesTables);
+				i.putExtra("DBName", DBName);
+				i.putExtra("listaAlteracao", new ArrayList<Alteracao>());
+				i.putExtra("columnsList", colunas);
+				startActivity(i);
+			}else{
+				Toast.makeText(this, "You can't delete this row, it's referenced in another table.", Toast.LENGTH_SHORT).show();
+			}
+			
 		}
 
 		return true;

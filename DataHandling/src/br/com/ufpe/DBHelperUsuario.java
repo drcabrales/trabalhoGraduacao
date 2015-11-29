@@ -435,7 +435,10 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 		}
 	}
 	
-	public void deleteRow(ArrayList<Coluna> colunas, ArrayList<Object> dados, String tableName){
+	public Long deleteRow(ArrayList<Coluna> colunas, ArrayList<Object> dados, String tableName){
+		database = getWritableDatabase();
+		//para habilitar verificação de foreign key
+		database.execSQL("PRAGMA foreign_keys = ON;");
 		int countPk = 0;
 		String query = "delete from " +tableName+ " where ";
 		for (int l = 0; l < colunas.size(); l++) {
@@ -462,7 +465,12 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			}
 		}
 		
-		database.execSQL(query);
+		try{
+			database.execSQL(query);
+			return (long) 1;
+		}catch(Exception e){
+			return (long) -1;
+		}
 	}
 
 	public Map<String, Object> getAllDataFromTable(String tablename, ArrayList<Coluna> colunas){
