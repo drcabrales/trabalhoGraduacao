@@ -38,6 +38,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.EditText;
@@ -94,10 +95,10 @@ public class DataViewActivity extends Activity {
 
 		//preenchendo o header com o nome das tabelas
 		TableRow headerNomesColunas = new TableRow(this);
-		//headerNomesColunas.setBackgroundColor(Color.rgb(136, 93, 178));
+		
 		for (int j = 0; j < colunasParaVisualizacao.size(); j++) {
 			TextView nomeColuna = new TextView(this);
-			nomeColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
+			nomeColuna.setLayoutParams(new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,1));
 			nomeColuna.setPadding(10, 10, 10, 10);
 			nomeColuna.setText(colunasParaVisualizacao.get(j).getNome());
 			nomeColuna.setTextColor(Color.WHITE);
@@ -112,6 +113,7 @@ public class DataViewActivity extends Activity {
 
 		//adiciona o table layout dos dados no scroll
 		dataTable.setLayoutParams(new TableLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
+		//dataTable.setStretchAllColumns(true);
 
 		//for para adicionar os table row de dados no table layout datatable
 		//tem que pegar a lista de dados para usar nesse for. aqui vai entrar tb a logica do multimidia (botao diferenciado)
@@ -119,6 +121,13 @@ public class DataViewActivity extends Activity {
 
 		for (int j = 0; j < (dados.size()/colunasParaVisualizacao.size()); j++) { //quantidade de linhas (dados totais / colunas)
 			TableRow linha = new TableRow(this);
+
+			TableLayout.LayoutParams tableRowParamsData=
+					new TableLayout.LayoutParams
+					(TableLayout.LayoutParams.WRAP_CONTENT,TableLayout.LayoutParams.WRAP_CONTENT,1);
+			tableRowParamsData.setMargins(0, 0, 0, 5);
+			linha.setLayoutParams(tableRowParamsData);
+
 			linha.setId(j);
 			linhasDeDados.add(linha);
 
@@ -162,7 +171,9 @@ public class DataViewActivity extends Activity {
 
 					if(path.substring(path.length()-3, path.length()).equals("png") || path.substring(path.length()-3, path.length()).equals("jpg") || path.substring(path.length()-4, path.length()).equals("jpeg")){ //imagem
 						final Button btnVerBlob = new Button(this);
-						btnVerBlob.setText("IMG");
+						btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.image));
+						LayoutParams lp = new TableRow.LayoutParams(120,80, 1f);
+						btnVerBlob.setLayoutParams(lp);
 						btnVerBlob.setId(Integer.parseInt(j + "" + k));
 
 						btnVerBlob.setOnClickListener(new OnClickListener() {
@@ -190,8 +201,10 @@ public class DataViewActivity extends Activity {
 					}else if(path.substring(path.length()-3, path.length()).equals("mp3") || path.substring(path.length()-3, path.length()).equals("ogg") || path.substring(path.length()-3, path.length()).equals("aac")){ //musica
 						final Button btnVerBlob = new Button(this);
 						btnVerBlob.setId(Integer.parseInt(j + "" + k));
-						
+
 						btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.play));
+						LayoutParams lp = new TableRow.LayoutParams(120,80, 1f);
+						btnVerBlob.setLayoutParams(lp);
 
 						btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -211,8 +224,10 @@ public class DataViewActivity extends Activity {
 						if(!(auxDadosBlob.get(Integer.parseInt(j + "" + k)).equals("null"))){
 							final Button btnVerBlob = new Button(this);
 							btnVerBlob.setId(Integer.parseInt(j + "" + k));
-							
+
 							btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.video));
+							LayoutParams lp = new TableRow.LayoutParams(120,80, 1f);
+							btnVerBlob.setLayoutParams(lp);
 
 							btnVerBlob.setOnClickListener(new OnClickListener() {
 
@@ -230,6 +245,13 @@ public class DataViewActivity extends Activity {
 							});
 
 							linha.addView(btnVerBlob);
+						}else{
+							final Button btnVerBlob = new Button(this);
+							btnVerBlob.setId(Integer.parseInt(j + "" + k));
+
+							//btnVerBlob.setBackgroundDrawable(this.getResources().getDrawable(android.R.drawable.));
+							LayoutParams lp = new TableRow.LayoutParams(120,80, 3f);
+							btnVerBlob.setLayoutParams(lp);
 						}
 					}
 
@@ -283,9 +305,9 @@ public class DataViewActivity extends Activity {
 			});
 		}
 
-		
+
 		backToColumns.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(getBaseContext(), NewColumnActivity.class);
@@ -299,7 +321,7 @@ public class DataViewActivity extends Activity {
 
 
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo){
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -314,31 +336,31 @@ public class DataViewActivity extends Activity {
 
 		if(item.getTitle().equals("Edit")){
 			Intent i = new Intent(getBaseContext(), EditDataActivity.class);
-			
+
 			//passa os dados da linha para a EditDataActivity, através de um hashmap("nomeDaColuna", valor)
 			HashMap<String, Object> dataRow = new HashMap<String, Object>();
 			for (int l = 0; l < colunasParaVisualizacao.size(); l++) {
 				TableRow aux = (TableRow) rowEscolhida;
-				
+
 				if(!colunasParaVisualizacao.get(l).getTipo().equals("BLOB")){
 					if(colunasParaVisualizacao.get(l).getTipo().equals("Varchar") || colunasParaVisualizacao.get(l).getTipo().equals("Text")){
-						
+
 						dataRow.put(colunasParaVisualizacao.get(l).getNome(), ((TextView) aux.getChildAt(l)).getText().toString());
-						
+
 					}else if(colunasParaVisualizacao.get(l).getTipo().equals("Integer")){
-						
+
 						dataRow.put(colunasParaVisualizacao.get(l).getNome(), Integer.parseInt(((TextView) aux.getChildAt(l)).getText().toString()));
-						
+
 					}else if(colunasParaVisualizacao.get(l).getTipo().equals("Double")){
-						
+
 						dataRow.put(colunasParaVisualizacao.get(l).getNome(), Double.parseDouble(((TextView) aux.getChildAt(l)).getText().toString()));
-						
+
 					}else if(colunasParaVisualizacao.get(l).getTipo().equals("Float")){
-						
+
 						dataRow.put(colunasParaVisualizacao.get(l).getNome(), Float.parseFloat(((TextView) aux.getChildAt(l)).getText().toString()));
-						
+
 					}else if(colunasParaVisualizacao.get(l).getTipo().equals("Datetime")){
-						
+
 						SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 						try {
 							dataRow.put(colunasParaVisualizacao.get(l).getNome(), format.parse(((TextView) aux.getChildAt(l)).getText().toString()));
@@ -346,34 +368,34 @@ public class DataViewActivity extends Activity {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
+
 					}else{
 						//boolean
 						//esse é passado como string mesmo porque na edição do dado ele é vindo de um spinner
 						dataRow.put(colunasParaVisualizacao.get(l).getNome(), ((TextView) aux.getChildAt(l)).getText().toString());
-						
+
 					}
 
 				}else{ //blob
-					
+
 					String recoveryKey = aux.getId() + "" + l; //para pegar da mesma forma que pega a URI no botão, chave feita por numLinha e numColuna
 					dataRow.put(colunasParaVisualizacao.get(l).getNome(), auxDadosBlob.get(Integer.parseInt(recoveryKey)));
-					
+
 				}
 			}
-			
+
 			//passa a hashmap de dados e a lista de colunas de visualização para a EditDataActivity
 			i.putExtra("ListaColunas", colunasParaVisualizacao);
 			i.putExtra("Linha", dataRow);
-			
-			
+
+
 			//também passa essas coisas para não dar erro na volta
 			i.putExtra("DBName", DBName);
 			i.putExtra("TableName", nameTabela);
 			i.putExtra("tablesList", namesTables);
 			i.putExtra("ListaTabelas", tabelas);
 			i.putExtra("listaAlteracao", listaAlteracao);
-			
+
 			//starta a activity
 			startActivity(i);
 		}else{
@@ -381,11 +403,11 @@ public class DataViewActivity extends Activity {
 			ArrayList<Coluna> colunasPK = new ArrayList<Coluna>();
 			ArrayList<Object> dadosPK = new ArrayList<Object>();
 			TableRow aux = (TableRow) rowEscolhida;
-			
+
 			for (int l = 0; l < colunasParaVisualizacao.size(); l++) {
 				if(colunasParaVisualizacao.get(l).isPK()){
 					colunasPK.add(colunasParaVisualizacao.get(l));
-					
+
 					if(colunas.get(l).getTipo().equals("Varchar") || colunas.get(l).getTipo().equals("Text")){
 						dadosPK.add(((TextView) aux.getChildAt(l)).getText().toString());
 					}else{
@@ -393,12 +415,12 @@ public class DataViewActivity extends Activity {
 					}
 				}
 			}
-			
+
 			Long retorno = dbHelperUsuario.deleteRow(colunasPK, dadosPK, nameTabela);
-			
+
 			if(retorno != -1){
 				Toast.makeText(this, "Row deleted!", Toast.LENGTH_SHORT).show();
-				
+
 				//para recriar a visualização da tabela de forma correta e completa, com os dados atualizados
 				Intent i = new Intent(getBaseContext(), DataViewActivity.class);
 				i.putExtra("nameTable", nameTabela);
@@ -410,7 +432,7 @@ public class DataViewActivity extends Activity {
 			}else{
 				Toast.makeText(this, "You can't delete this row, it's referenced in another table.", Toast.LENGTH_SHORT).show();
 			}
-			
+
 		}
 
 		return true;
@@ -448,7 +470,7 @@ public class DataViewActivity extends Activity {
 
 		btnNovoDado = (Button) findViewById(R.id.btnNewData);
 		linhasDeDados = new ArrayList<TableRow>();
-		
+
 		backToColumns = (Button) findViewById(R.id.btnBackInDataView);
 
 		//preenchendo as colunas da visualização
