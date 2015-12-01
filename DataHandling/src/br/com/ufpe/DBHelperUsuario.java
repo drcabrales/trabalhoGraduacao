@@ -111,7 +111,7 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 
 			if(entrouForeignKey){
 				//tirando a virgula do final
-				createTable = createTable.substring(0,createTable.length()-2) + "); ";
+				createTable = createTable.substring(0,createTable.length()-1) + "); ";
 			}else{
 				createTable = createTable.substring(0,createTable.length()-1) + "); ";
 			}
@@ -411,14 +411,14 @@ public class DBHelperUsuario extends SQLiteOpenHelper{
 			if(colunas.get(i).isPK()){
 				if(countPK == 1){
 					if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
-						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + "' ";
+						query = query + colunas.get(i).getNome() + " = '" + dados.get(i) + "' ";
 					}else{
 						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + " ";
 					}
 					countPK--;
 				}else{
 					if(colunas.get(i).getTipo().equals("Varchar") || colunas.get(i).getTipo().equals("Text")){
-						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + "' and ";
+						query = query + colunas.get(i).getNome() + " = '" + dados.get(i) + "' and ";
 					}else{
 						query = query + colunas.get(i).getNome() + " = " + dados.get(i) + " and ";
 					}
